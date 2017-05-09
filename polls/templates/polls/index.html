@@ -1,0 +1,11 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}"
+{% if latest_question_list %}
+    <ul>
+    {% for foo in latest_question_list %}
+        <li><a href="{% url 'polls:detail' foo.id %}">{{ foo.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>没有数据</p>
+{% endif %}

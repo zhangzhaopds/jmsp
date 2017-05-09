@@ -1,0 +1,8 @@
+<h3>{{ question.question_text }}</h3>
+<ul>
+    {% for foo in question.choice_set.all %}
+    <li>{{ foo.choice_text }} ----- {{ foo.votes }}</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'polls:detail' question.id %}">重新投票？</a>
+<a href="{% url 'polls:index' %}" >投票列表</a>
