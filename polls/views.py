@@ -6,8 +6,8 @@ from django.core.urlresolvers import reverse
 # Create your views here.
 
 def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    # latest_question_list = get_list_or_404(Question.objects.order_by('-pub_date')[:5])
+    # latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    latest_question_list = get_list_or_404(Question.objects.order_by('-pub_date')[:5])
     return render(request, 'polls/index.html', {'latest_question_list': latest_question_list})
 
 def detail(request, question_id):
