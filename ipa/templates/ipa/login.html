@@ -1,0 +1,44 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>Jmsp</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'ipa/style.css' %}">
+    <link rel="apple-touch-icon" href="{% static 'ipa/images/touch_icon.png' %}">
+    <meta name="description" content="内用内测">
+    <meta name="keywords" content="jmsp">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+</head>
+<body class="il-body">
+    <div class="il-header">
+        <a href="{% url 'ipa:index' %}">
+            <img class="logo-img" src="{% static 'ipa/images/jmsp_logo.png' %}"/>
+        </a>
+    </div>
+    <div class="il-content">
+        <div class="il-content-box">
+            <h4 style="text-align: center; font-size: 17px; color: #0D181D;">登 陆</h4>
+            <div class="il-login-input">
+                <input class="il-content-input" placeholder="请输入邮箱">
+            </div>
+            <div class="il-login-input">
+                <input class="il-content-input" placeholder="密码">
+            </div>
+            <button class="il-submit" type="submit" disabled="disabled" style="margin-top: 30px;">登 陆</button>
+            <div style="display: flex; justify-content: space-between; margin-top: 30px">
+                <a style="color: #0D181D">忘记密码</a>
+                <a href="{% url 'ipa:register' %}" style="color: #0D181D" target="_blank">注册账户</a>
+            </div>
+        </div>
+    </div>
+    <div class="il-footer">
+        <div class="il-footer-box">
+            Rome was not built in a day!
+        </div>
+    </div>
+</body>
+</html>

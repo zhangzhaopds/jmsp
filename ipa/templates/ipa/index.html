@@ -1,0 +1,46 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>Jmsp</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'ipa/style.css' %}">
+    <link rel="apple-touch-icon" href="{% static 'ipa/images/touch_icon.png' %}">
+    <meta name="description" content="内用内测">
+    <meta name="keywords" content="jmsp,应用内测">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+</head>
+<body class="index-body">
+    <div class="top-bar-wrapper">
+        <div class="top-bar-content-wrapper">
+            <div class="top-bar-content-bg">
+                <div class="top-bar-content-title">
+                    <img class="logo-img" src="{% static 'ipa/images/jmsp_logo.png' %}">
+                </div>
+                <div class="top-bar-content-left">
+{#                    <label>鸡毛蒜皮</label>#}
+{#                    <label>悟空</label>#}
+
+                </div>
+                <div class="top-bar-content-right">
+                    <ul>
+                        <li class="top-bar-right-li">
+                            <a href="{% url 'ipa:login' %}">登陆</a>
+                        </li>
+                        <li class="top-bar-right-li">
+                            <a href="{% url 'ipa:register' %}">注册</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mid-content-wrapper">
+
+    </div>
+
+</body>
+</html>

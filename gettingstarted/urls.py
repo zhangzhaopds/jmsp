@@ -6,5 +6,5 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^polls/', include('polls.urls', namespace="polls")),
-
+    url(r'^', include('ipa.urls', namespace='ipa')),
 ]

@@ -1,0 +1,54 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>Jmsp</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'ipa/style.css' %}">
+    <link rel="apple-touch-icon" href="{% static 'ipa/images/touch_icon.png' %}">
+    <meta name="description" content="内用内测">
+    <meta name="keywords" content="jmsp">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+</head>
+<body class="il-body">
+    <div class="il-header">
+        <a href="{% url 'ipa:index' %}">
+            <img class="logo-img" src="{% static 'ipa/images/jmsp_logo.png' %}"/>
+        </a>
+    </div>
+    <div class="il-content">
+        <div class="il-content-box">
+            <h4 style="text-align: center; font-size: 17px; color: #0D181D">注 册</h4>
+            <p style="font-size: 14px; color: #0D181D; line-height: 30px">Jmsp 将发送一封验证邮件到你的邮箱，此邮箱将作为登陆用户名</p>
+            <div>
+                <input class="il-content-input" placeholder="输入你的邮箱">
+            </div>
+            <div class="il-agree">
+                <label id="forAgree" for="isAgree">
+                    <input type="checkbox" id="isAgree" name="isCheck" value="0"/>
+                </label>
+                <span style="font-size: 13px;">
+                    我已阅读并同意
+                    <a href="https://pingxx.com/terms#terms" target="_blank">《服务协议》</a>
+                    和
+                    <a href="https://pingxx.com/terms#privacy" target="_blank">《隐私权协议》</a>
+                </span>
+            </div>
+            <button class="il-submit" type="submit" disabled="disabled">发送验证邮件</button>
+            <div class="il-grayline"></div>
+            <div class="il-has-name-login">
+                已有账号？
+                <a href="{% url 'ipa:login' %}" target="_blank">点此登陆</a>
+            </div>
+        </div>
+    </div>
+    <div class="il-footer">
+        <div class="il-footer-box">
+            Rome was not built in a day!
+        </div>
+    </div>
+</body>
+</html>
