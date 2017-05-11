@@ -8,4 +8,4 @@ class UserInfo(models.Model):
     email = models.EmailField()
     is_active = models.BooleanField(default=0)
     def __str__(self):
-        return self.user_name
+        return self.email
