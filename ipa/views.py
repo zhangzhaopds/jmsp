@@ -51,11 +51,11 @@ def signup(request):
             message = "\n".join([
                 u'{0},欢迎您的加入'.format(request.POST['email']),
                 u'请访问该链接，完成用户验证:',
-                'http://' + request.get_host() + '/signup?token=' + token
+                'https://' + request.get_host() + '/signup?token=' + token
             ])
             print(message)
             # send_mail(u'注册用户验证信息', message, "tongxingpay2016@163.com", [email])
-            return HttpResponse('已发送验证邮件到你的邮箱，请查看。')
+            return HttpResponse('已发送验证邮件到你的邮箱，请查看。' + message)
     else:
         try:
             email = tools.Token().confirm_validate_token(request.GET['token'])
