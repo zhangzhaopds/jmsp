@@ -32,8 +32,8 @@
                 </div>
                 <button class="il-submit" type="submit" style="margin-top: 30px;">登 陆</button>
                 <div style="display: flex; justify-content: space-between; margin-top: 30px">
-                    <a style="color: #0D181D">忘记密码</a>
-                    <a href="{% url 'ipa:register' %}" style="color: #0D181D" target="_blank">注册账户</a>
+                    <a href="{% url 'ipa:register' '1' %}" style="color: #0D181D">忘记密码</a>
+                    <a href="{% url 'ipa:register' '0' %}" style="color: #0D181D" target="_blank">注册账户</a>
                 </div>
             </div>
         </form>

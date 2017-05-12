@@ -12,15 +12,14 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 import dj_database_url
 
-# EMAIL_HOST = '127.0.0.1'
-EMAIL_HOST_USER = 'tongxingpay2016@163.com'
-EMAIL_HOST_PASSWORD = '2016tongxingpay'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.163.com'
 EMAIL_USE_TLS = True
-# EMAIL_PORT = 80
-# EMAIL_HOST_USER='godad@*****.com'
-# EMAIL_HOST_PASSWORD='*******'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'jmspvu@gmail.com'
+EMAIL_HOST_PASSWORD = '15542659192'
+
+# 开启不安全访问，针对google email
+# https://myaccount.google.com/lesssecureapps
 
 # admin01  admin123456
 

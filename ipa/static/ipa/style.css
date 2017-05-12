@@ -101,6 +101,16 @@ html {
     bottom: 0;
 }
 
+.il-header-user {
+    /*background-color: red;*/
+    float: right;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /*margin-top: 20px;*/
+}
+
 .il-content-box {
     height: 100%;
     width: 320px;
@@ -120,7 +130,7 @@ input:focus {
 
 .il-agree {
     margin-top: 20px;
-    margin-bottom: 20px;
+    /*margin-bottom: 20px;*/
 }
 
 .il-submit {
@@ -131,6 +141,7 @@ input:focus {
     background-color: #DADADA;
     font-size: 15px;
     color: white;
+    margin-top: 20px;
 }
 
 .il-grayline {
@@ -170,6 +181,24 @@ a {
     color: deepskyblue;
 }
 
+.messages {
+    /*Your code */
+}
+
+.messages .success {
+    /*Your code, e.g. background: green */
+    background: green;
+}
+
+.messages .error {
+    /*Your code, e.g. background: black */
+    background: red;
+}
+
+.messages .warning {
+    /*Your code, e.g. background: red */
+    background: yellow;
+}
 
 
 

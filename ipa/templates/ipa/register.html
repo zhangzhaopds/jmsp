@@ -22,7 +22,7 @@
     <div class="il-content">
         <div class="il-content-box">
             <h4 style="text-align: center; font-size: 17px; color: #0D181D">1、验证邮箱</h4>
-            <p style="font-size: 14px; color: #0D181D; line-height: 30px">Jmsp 将发送一封验证邮件到你的邮箱，此邮箱将作为登陆用户名</p>
+            <p style="font-size: 14px; color: #0D181D; line-height: 30px">{{ reset }}</p>
 
 
             <form method="post" action="{% url 'ipa:signup' %}">
@@ -30,6 +30,8 @@
                 <div>
                     <input class="il-content-input" placeholder="输入你的邮箱" name="email">
                 </div>
+                <input name="active" value="{{ is_active }}" hidden="hidden">
+                {% if is_active %}
                 <div class="il-agree">
                     <label id="forAgree" for="isAgree">
                         <input type="checkbox" id="isAgree" name="isCheck"/>
@@ -41,14 +43,19 @@
                         <a href="https://pingxx.com/terms#privacy" target="_blank">《隐私权协议》</a>
                     </span>
                 </div>
+                {% endif %}
+
                 <button class="il-submit" type="submit">发送验证邮件</button>
             </form>
 
             <div class="il-grayline"></div>
+            {% if is_active %}
             <div class="il-has-name-login">
                 已有账号？
                 <a href="{% url 'ipa:login' %}" target="_blank">点此登陆</a>
             </div>
+            {% endif %}
+
         </div>
     </div>
     <div class="il-footer">
