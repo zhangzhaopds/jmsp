@@ -63,7 +63,7 @@ def signup(request):
         message = "\n".join([
             u'{0},欢迎您的加入'.format(request.POST['email']),
             u'请访问该链接，完成用户验证:',
-            'http://' + request.get_host() + '/signup?token=' + token
+            'https://' + request.get_host() + '/signup?token=' + token
         ])
         print(message)
         try:
