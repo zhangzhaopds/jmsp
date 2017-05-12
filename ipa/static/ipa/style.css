@@ -10,19 +10,24 @@ html {
 }
 
 .top-bar-wrapper {
-    background-color: #F9F9F9;
+    /*background-color: #F9F9F9;*/
     height: 84px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     position: fixed;
     width: 100%;
+    background: #000;
+    filter: alpha(opacity:30);
+    opacity:0.3;
 }
 
 .top-bar-content-wrapper {
     /*background-color: beige;*/
     height: 52px;
     width: 100%;
+
+    /*background: #000;*/
 }
 
 .top-bar-content-bg {
@@ -65,8 +70,12 @@ html {
 
 .mid-content-wrapper {
     background-color: #FEFEFE;
-    height: 100rem;
-    margin-top: 85px;
+    height: 700px;
+    /*margin-top: 85px;*/
+    padding-top: 85px;
+    background: url("images/main_logo.jpg") no-repeat;
+    background-size: 100%;
+
 }
 
 .il-body {
