@@ -53,10 +53,9 @@ def signup(request):
         print(request.POST['email'])
         email = request.POST['email']
         active = request.POST['active'] # 1: 注册， 0：找回
-        UserInfo.objects.filter(email=email).delete()
 
-        if active == "0":
-            return HttpResponse('用户不存在，请先注册')
+        # 注册与找回  都删除重建
+        UserInfo.objects.filter(email=email).delete()
 
         token = tools.Token().generate_validate_token(key=email)
 
