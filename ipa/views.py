@@ -87,10 +87,10 @@ def upload_file(request):
     key = email + "/" + myFile.name
 
     # 上传文件到七牛后， 七牛将文件名和文件大小回调给业务服务器。
-    policy = {
-        'callbackUrl': 'http://your.domain.com/callback.php',
-        'callbackBody': 'filename=$(fname)&filesize=$(fsize)'
-    }
+    # policy = {
+    #     'callbackUrl': 'http://your.domain.com/callback.php',
+    #     'callbackBody': 'filename=$(fname)&filesize=$(fsize)'
+    # }
 
     base = 'http://opu0gas3t.bkt.clouddn.com/'
 
