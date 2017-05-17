@@ -89,6 +89,7 @@ def upload_file(request):
     #     'callbackBody': 'filename=$(fname)&filesize=$(fsize)'
     # }
 
+    # 不能出现 http://  或者 https:// 字样，否则heroku中出错
     base = 'opu0gas3t.bkt.clouddn.com/'
 
     # 生成上传 Token，可以指定过期时间等
