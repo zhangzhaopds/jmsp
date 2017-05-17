@@ -5,6 +5,9 @@ from .models import UserInfo
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from qiniu import Auth, put_file, etag
+import os
+import markdown2
 
 
 # Create your views here.
@@ -43,9 +46,80 @@ def password(request, type, email):
 
 def home(request, email):
     print(email)
+
     return render(request, 'ipa/home.html', {
-        'email': email
+        'email': email,
+        'hasContent': 0,
+        'upload_file_change': upload_file_change(email)
     })
+
+# 文件上传
+def upload_file(request):
+    myFile = request.FILES.get("file", None)  # 获取上传的文件，如果没有文件，则默认为None
+    print(myFile.size)
+    # email = request.POST['email']
+    email = 'zhangzhaopds@foxmail.com'
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+    path = os.path.join(BASE_DIR, 'ipa/static/ipa/images/')
+    print(path)
+    localfile = os.path.join(path, myFile.name)
+    if not myFile:
+        return HttpResponse("no files for upload!")
+    destination = open(localfile, 'wb+')  # 打开特定的文件进行二进制的写操作
+    for chunk in myFile.chunks():  # 分块写入文件
+        destination.write(chunk)
+    destination.close()
+
+    # html = markdown2.markdown_path(localfile)
+    # print(html)
+
+    # 密钥
+    access_key = 'CfEmsrk8eSKQtZ8OY5NHUPWJ3VKfoGHEP1fzYStf'
+    secretKey = 'cdxPmlWXpkAGUeGRZkhocGMYfVnqdEa-otwer9Ma'
+
+    # 鉴权
+    a = Auth(access_key, secret_key=secretKey)
+
+    # 空间名
+    bucket_name = 'jmspvu'
+
+    # 文件保存名
+    key = email + "/" + myFile.name
+
+    # 上传文件到七牛后， 七牛将文件名和文件大小回调给业务服务器。
+    policy = {
+        'callbackUrl': 'http://your.domain.com/callback.php',
+        'callbackBody': 'filename=$(fname)&filesize=$(fsize)'
+    }
+
+    base = 'http://opu0gas3t.bkt.clouddn.com/'
+
+    # 生成上传 Token，可以指定过期时间等
+    token = a.upload_token(bucket_name, key, 3600)
+
+    ret, info = put_file(token, key, localfile)
+    print(info)
+    print(info.status_code)
+    assert ret['key'] == key
+    assert ret['hash'] == etag(localfile)
+    user = get_object_or_404(UserInfo, email=email)
+    user.username = base + key
+    user.save()
+    os.remove(localfile)
+    print('上传完毕')
+    # return HttpResponse('')
+    return render(request, 'ipa/home.html', {
+        'hasContent': 1,
+        'content': '上传完毕'
+    })
+
+
+
+def upload_file_change(value):
+    print(")_)_)_)_)_")
+    print(value)
+    print('改变-------')
+
 
 # 提交邮箱验证
 def signup(request):
