@@ -89,7 +89,7 @@ def upload_file(request):
     #     'callbackBody': 'filename=$(fname)&filesize=$(fsize)'
     # }
 
-    base = 'http://opu0gas3t.bkt.clouddn.com/'
+    base = 'opu0gas3t.bkt.clouddn.com/'
 
     # 生成上传 Token，可以指定过期时间等
     token = a.upload_token(bucket_name, key, 3600)
@@ -107,7 +107,7 @@ def upload_file(request):
     return render(request, 'ipa/home.html', {
         'hasContent': 1,
         'content': '上传完毕',
-        'img_url': user.username
+        'img_url': 'http://' + user.username
     })
 
 
