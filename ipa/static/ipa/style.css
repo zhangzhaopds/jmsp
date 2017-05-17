@@ -236,4 +236,25 @@ a {
     text-decoration: none;
 }
 
+.success_info {
+    color: green;
+    font-size: larger;
+}
+
+.error_info {
+    color: red;
+}
+
+.upload_detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.upload_img {
+    margin-top: 20px;
+}
+
+
+
 

@@ -70,9 +70,6 @@ def upload_file(request):
         destination.write(chunk)
     destination.close()
 
-    # html = markdown2.markdown_path(localfile)
-    # print(html)
-
     # 密钥
     access_key = 'CfEmsrk8eSKQtZ8OY5NHUPWJ3VKfoGHEP1fzYStf'
     secretKey = 'cdxPmlWXpkAGUeGRZkhocGMYfVnqdEa-otwer9Ma'
@@ -107,10 +104,10 @@ def upload_file(request):
     user.save()
     os.remove(localfile)
     print('上传完毕')
-    # return HttpResponse('')
     return render(request, 'ipa/home.html', {
         'hasContent': 1,
-        'content': '上传完毕'
+        'content': '上传完毕',
+        'img_url': user.username
     })
 
 
@@ -127,6 +124,7 @@ def signup(request):
         print(request.POST['email'])
         email = request.POST['email']
         active = request.POST['active'] # 1: 注册， 0：找回
+
 
         # 注册与找回  都删除重建
         UserInfo.objects.filter(email=email).delete()
@@ -147,12 +145,7 @@ def signup(request):
             return HttpResponse('已发送验证邮件到你的邮箱，请查看。')
         except:
             return HttpResponse('邮件发送失败')
-        # try:
-        #     user = UserInfo.objects.get(email=email)
-        #     # messages.error(request, '用户已存在，可直接登录')
-        #     if user.is_active == 0:
-        #         return HttpResponse('用户未激活，请点击验证邮件中的链接激活！')
-        # except:
+
     else:
         try:
             email = tools.Token().confirm_validate_token(request.GET['token'])
@@ -172,9 +165,17 @@ def checkpsw(request):
         print(request.POST['second_input'])
         print(email)
         if first == "":
-            return HttpResponse('密码不能为空')
+            return render(request, 'ipa/password.html', {
+                'error_info': '密码不能为空',
+                "titletype": "2、设置密码",
+                "email": email
+            })
         if second == "":
-            return HttpResponse('密码不能为空')
+            return render(request, 'ipa/password.html', {
+                'error_info': '密码不能为空',
+                "titletype": "2、设置密码",
+                "email": email
+            })
         if first == second:
             user = get_object_or_404(UserInfo, email=email)
             user.password = second
@@ -183,7 +184,11 @@ def checkpsw(request):
             # render(request, 'ipa/login.html')
             return HttpResponseRedirect(reverse('ipa:login', args=(None)))
         else:
-            return HttpResponse('两次密码不一致')
+            return render(request, 'ipa/password.html', {
+                'error_info': '密码不一致',
+                "titletype": "2、设置密码",
+                "email": email
+            })
 
 
 
@@ -195,11 +200,18 @@ def checklogin(request):
     try:
         user = UserInfo.objects.get(email=u_name)
     except UserInfo.DoesNotExist:
-        return HttpResponse('用户不存在')
+        return render(request, 'ipa/login.html', {
+            'error_info': '用户不存在'
+        })
     if user.is_active == 0:
-        return HttpResponse(u'尚未验证用户邮箱，请点击验证邮件中的链接进行验证或者重新注册')
+        return render(request, 'ipa/login.html', {
+            'error_info': u'尚未验证用户邮箱，请点击验证邮件中的链接进行验证或者重新注册'
+        })
     if user.password != u_psw:
-        return HttpResponse('密码错误')
+        return render(request, 'ipa/login.html', {
+            'error_info': '密码错误',
+            'user_name': u_name
+        })
     print(u_name)
     print(u_psw)
     return HttpResponseRedirect(reverse('ipa:home', args=(u_name,)))

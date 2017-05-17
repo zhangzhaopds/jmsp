@@ -25,11 +25,16 @@
             <div class="il-content-box">
                 <h4 style="text-align: center; font-size: 17px; color: #0D181D;">登 陆</h4>
                 <div class="il-login-input">
-                    <input class="il-content-input" placeholder="请输入邮箱" name="email">
+                    <input class="il-content-input" placeholder="请输入邮箱" name="email" value="{{ user_name }}">
                 </div>
                 <div class="il-login-input">
                     <input class="il-content-input" placeholder="密码" name="password">
                 </div>
+                {% if error_info %}
+                    <label class="error_info">
+                        {{ error_info }}
+                    </label>
+                {% endif %}
                 <button class="il-submit" type="submit" style="margin-top: 30px;">登 陆</button>
                 <div style="display: flex; justify-content: space-between; margin-top: 30px">
                     <a href="{% url 'ipa:register' '1' %}" style="color: #0D181D">忘记密码</a>

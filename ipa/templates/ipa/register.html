@@ -44,7 +44,12 @@
                     </span>
                 </div>
                 {% endif %}
-
+                {% if error_info %}
+                <label class="error_info">{{ error_info }}</label>
+                {% endif %}
+                {% if success_info %}
+                <label class="success_info">{{ success_info }}</label>
+                {% endif %}
                 <button class="il-submit" type="submit">发送验证邮件</button>
             </form>
 
