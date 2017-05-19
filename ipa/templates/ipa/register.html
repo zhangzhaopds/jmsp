@@ -24,14 +24,13 @@
             <h4 style="text-align: center; font-size: 17px; color: #0D181D">1、验证邮箱</h4>
             <p style="font-size: 14px; color: #0D181D; line-height: 30px">{{ reset }}</p>
 
-
             <form method="post" action="{% url 'ipa:signup' %}">
                 {% csrf_token %}
                 <div>
                     <input class="il-content-input" placeholder="输入你的邮箱" name="email">
                 </div>
                 <input name="active" value="{{ is_active }}" hidden="hidden">
-                {% if is_active %}
+                {% if is_active == "0" %}
                 <div class="il-agree">
                     <label id="forAgree" for="isAgree">
                         <input type="checkbox" id="isAgree" name="isCheck"/>

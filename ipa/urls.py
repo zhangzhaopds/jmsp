@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^login$', views.login, name='login'),
+    url(r'^loginout$', views.do_logout, name='logout'),
     url(r'^register/(?P<reset>[0-1])$', views.register, name='register'),
     url(r'^signup$', views.signup, name='signup'),
     url(r'^password/(?P<type>[0-9])/(?P<email>[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+)$', views.password, name='password'),

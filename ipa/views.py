@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail, EmailMessage
-from . import tools
+from .tools import Token
 from .models import UserInfo
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -8,36 +8,51 @@ from django.contrib import messages
 from qiniu import Auth, put_file, etag
 import os
 import markdown2
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from django.contrib import auth
+from .forms import RegistrationForm
 
 
 # Create your views here.
 
+
 def index(request):
-    return render(request, 'ipa/index.html', {'user': '大王'})
+    current_user = ''
+    email = ''
+    if request.user is not None:
+        print("当前登陆用户：" + request.user.username)
+        current_user = request.user.email
+        email = request.user.email
+    print("用户：" + current_user)
+    return render(request, 'ipa/index.html', {
+        'user': current_user,
+        'email': email
+    })
 
 def login(request):
     return render(request, 'ipa/login.html')
 
 def register(request, reset):
     print(reset)
+    # 新用户
     if reset == "0":
         return render(request, 'ipa/register.html', {
             'reset': u"Jmsp 将发送一封验证邮件到你的邮箱，此邮箱将作为登陆用户名",
-            'is_active': 1
+            'is_active': "0"
         })
     else:
+        # 找回密码用户
         return render(request, 'ipa/register.html', {
             'reset': u'Jmsp 将发送一封验证邮件到你的注册邮箱，请注意查收！',
-            'is_active': 0
+            'is_active': "1"
         })
 
 def password(request, type, email):
-    print(type)
-    print(email)
     try:
-        UserInfo.objects.get(email=email)
-    except UserInfo.DoesNotExist:
-        return HttpResponse('用户不存在')
+        User.objects.get(email=email)
+    except User.DoesNotExist:
+        return HttpResponse('【邮箱尚未验证】<a href="/register/0">注册此邮箱</a>')
     if type == '1':
         return render(request, 'ipa/password.html', {"titletype": "2、设置密码", "email": email})
     else:
@@ -57,8 +72,8 @@ def home(request, email):
 def upload_file(request):
     myFile = request.FILES.get("file", None)  # 获取上传的文件，如果没有文件，则默认为None
     print(myFile.size)
-    # email = request.POST['email']
-    email = 'zhangzhaopds@foxmail.com'
+    email = request.POST['email']
+    # email = 'zhangzhaopds@foxmail.com'
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     path = os.path.join(BASE_DIR, 'ipa/static/ipa/images/')
     print(path)
@@ -108,6 +123,7 @@ def upload_file(request):
     return render(request, 'ipa/home.html', {
         'hasContent': 1,
         'content': '上传完毕',
+        'email': email,
         'img_url': 'http://' + user.username
     })
 
@@ -124,32 +140,55 @@ def signup(request):
     if request.method == 'POST':
         print(request.POST['email'])
         email = request.POST['email']
-        active = request.POST['active'] # 1: 注册， 0：找回
-
-
-        # 注册与找回  都删除重建
-        UserInfo.objects.filter(email=email).delete()
-
-        token = tools.Token().generate_validate_token(key=email)
-
-        message = "\n".join([
-            u'{0},欢迎您的加入'.format(request.POST['email']),
-            u'请访问该链接，完成用户验证:',
-            'https://' + request.get_host() + '/signup?token=' + token
-        ])
-        print(message)
+        active = request.POST['active'] # 0: 注册， 1：找回
+        # 找回密码
+        if active == '1':
+          try:
+              user = User.objects.get(email=email)
+              token = Token().generate_validate_token(key=email)
+              message = '\n'.join([
+                  u'{0},欢迎您的加入'.format(email),
+                  u'请点击下面链接，完成用户密码重置:',
+                  u'https://' + request.get_host() + '/signup?token=' + token
+              ])
+              print(message)
+              try:
+                  sendEmail = EmailMessage('注册用户验证信息', message, to=[email])
+                  sendEmail.send()
+                  user.is_active = 0
+                  user.save()
+                  return HttpResponse('【邮件发送成功，请注意查收！】')
+              except:
+                  print(email + u'【邮件发送失败】')
+                  return HttpResponse(email + '【邮箱发送失败】')
+          except User.DoesNotExist:
+              return HttpResponse("【邮箱尚未注册】")
+        # 注册
         try:
-            emails = EmailMessage('注册用户验证信息', message, to=[email])
-            emails.send()
-            user = UserInfo.objects.create(username='', password='', email=email, is_active=0)
-            user.save()
-            return HttpResponse('已发送验证邮件到你的邮箱，请查看。')
-        except:
-            return HttpResponse('邮件发送失败')
-
+            User.objects.get(email=email)
+            print('存在')
+            return HttpResponse('【邮箱已经被注册】<a href="/login">立即登陆</a>')
+        except User.DoesNotExist:
+            token = Token().generate_validate_token(key=email)
+            message = '\n'.join([
+                u'{0},欢迎您的加入'.format(email),
+                u'请点击下面链接，完成用户验证:',
+                u'https://' + request.get_host() + '/signup?token=' + token
+            ])
+            print(message)
+            try:
+                sendEmail = EmailMessage('注册用户验证信息', message, to=[email])
+                sendEmail.send()
+                user = User.objects.create_user(email[:3], email, '123456')
+                user.is_active = 0
+                user.save()
+                return HttpResponse('【邮件发送成功，请注意查收！】')
+            except:
+                print(email + u'【邮件发送失败】')
+                return HttpResponse(email + '【邮箱发送失败】')
     else:
         try:
-            email = tools.Token().confirm_validate_token(request.GET['token'])
+            email = Token().confirm_validate_token(request.GET['token'])
             print("验证：" + email)
             return HttpResponseRedirect(reverse('ipa:password', args=(1, email,)))
         except:
@@ -159,63 +198,63 @@ def signup(request):
 # 密码提交验证
 def checkpsw(request):
     if request.method == "POST":
-        first = request.POST['first_input']
-        second = request.POST['second_input']
-        email = request.POST['email']
-        print(request.POST['first_input'])
-        print(request.POST['second_input'])
-        print(email)
-        if first == "":
-            return render(request, 'ipa/password.html', {
-                'error_info': '密码不能为空',
-                "titletype": "2、设置密码",
-                "email": email
-            })
-        if second == "":
-            return render(request, 'ipa/password.html', {
-                'error_info': '密码不能为空',
-                "titletype": "2、设置密码",
-                "email": email
-            })
-        if first == second:
-            user = get_object_or_404(UserInfo, email=email)
-            user.password = second
-            user.is_active = 1
-            user.save()
-            # render(request, 'ipa/login.html')
-            return HttpResponseRedirect(reverse('ipa:login', args=(None)))
-        else:
-            return render(request, 'ipa/password.html', {
-                'error_info': '密码不一致',
-                "titletype": "2、设置密码",
-                "email": email
-            })
-
-
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data['username'])
+            print(form.cleaned_data['password2'])
+            print(form.cleaned_data['password1'])
+            print(form.cleaned_data['email'])
+            try:
+                user = User.objects.get(email=form.cleaned_data['email'])
+                if form.cleaned_data['password2']:
+                    user.username = form.cleaned_data['username']
+                    user.password = form.cleaned_data['password2']
+                    user.is_active = 1
+                    user.save()
+                    return HttpResponseRedirect(reverse('ipa:login', args=(None)))
+                else:
+                    return HttpResponse('注册失败，密码不一致')
+            except User.DoesNotExist:
+                return HttpResponse('该邮箱尚未验证')
+        return HttpResponse('注册失败，填写信息有误')
 
 
 # 登陆验证
 def checklogin(request):
-    u_name = request.POST['email']
+    u_email = request.POST['email']
     u_psw = request.POST['password']
+    print("登陆验证：" + u_psw)
     try:
-        user = UserInfo.objects.get(email=u_name)
-    except UserInfo.DoesNotExist:
+        user = User.objects.get(email=u_email)
+        print(user.password)
+        if user.is_active == 0:
+            return render(request, 'ipa/login.html', {
+                'error_info': u'尚未验证用户邮箱，请点击验证邮件中的链接进行验证或者重新注册'
+            })
+        if user.password != u_psw:
+            return render(request, 'ipa/login.html', {
+                'error_info': '密码错误',
+                'user_name': user.email
+            })
+        print(u_email)
+        print(u_psw)
+        # user.is_authenticated = 1
+        print("登陆认证：")
+        print(user.is_authenticated)
+        print(user.password)
+        print(user.username)
+        auth.login(request, user)
+        print("登陆认证：")
+        return HttpResponseRedirect(reverse('ipa:home', args=(u_email,)))
+    except User.DoesNotExist:
         return render(request, 'ipa/login.html', {
             'error_info': '用户不存在'
         })
-    if user.is_active == 0:
-        return render(request, 'ipa/login.html', {
-            'error_info': u'尚未验证用户邮箱，请点击验证邮件中的链接进行验证或者重新注册'
-        })
-    if user.password != u_psw:
-        return render(request, 'ipa/login.html', {
-            'error_info': '密码错误',
-            'user_name': u_name
-        })
-    print(u_name)
-    print(u_psw)
-    return HttpResponseRedirect(reverse('ipa:home', args=(u_name,)))
+
+def do_logout(request):
+    print("退出的登陆")
+    auth.logout(request)
+    return render(request, 'ipa/index.html', {'user': ''})
 
 
 # token验证
