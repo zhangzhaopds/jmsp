@@ -113,7 +113,8 @@ html {
 .il-header-user {
     /*background-color: red;*/
     float: right;
-    margin-right: 10px;
+    margin-right: 20px;
+    margin-left: 10px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;

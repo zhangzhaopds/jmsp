@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail, EmailMessage
 from .tools import Token
-from .models import UserInfo
+from .models import UserProfile
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -20,14 +20,15 @@ from .forms import RegistrationForm
 def index(request):
     current_user = ''
     email = ''
-    if request.user is not None:
+    if request.user.is_authenticated:
         print("当前登陆用户：" + request.user.username)
         current_user = request.user.email
         email = request.user.email
     print("用户：" + current_user)
     return render(request, 'ipa/index.html', {
         'user': current_user,
-        'email': email
+        'email': email,
+        'avatar': ""
     })
 
 def login(request):
@@ -59,20 +60,29 @@ def password(request, type, email):
         return render(request, 'ipa/password.html', {"titletype": "2、重置密码", "email": email})
 
 
-def home(request, email):
-    print(email)
+def home(request):
+    if request.user.is_authenticated:
+        print("当前用户：" + request.user.username)
+        return render(request, 'ipa/home.html', {
+            'email': request.user.email,
+            'hasContent': 0,
+            'avatar': UserProfile.objects.get(user=request.user).avatar
+        })
+    else:
+        print("用户未登录，请先登录")
+        return render(request, 'ipa/login.html')
 
-    return render(request, 'ipa/home.html', {
-        'email': email,
-        'hasContent': 0,
-        'upload_file_change': upload_file_change(email)
-    })
+
 
 # 文件上传
 def upload_file(request):
     myFile = request.FILES.get("file", None)  # 获取上传的文件，如果没有文件，则默认为None
     print(myFile.size)
-    email = request.POST['email']
+    # email = request.POST['email']
+    if request.user.is_authenticated == 0:
+        return render(request, 'ipa/login.html')
+    email = request.user.email
+    print(email)
     # email = 'zhangzhaopds@foxmail.com'
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     path = os.path.join(BASE_DIR, 'ipa/static/ipa/images/')
@@ -115,16 +125,20 @@ def upload_file(request):
     print(info.status_code)
     assert ret['key'] == key
     assert ret['hash'] == etag(localfile)
-    user = get_object_or_404(UserInfo, email=email)
-    user.username = base + key
-    user.save()
+    # user = User.objects.get(email=email)
+    user = User.objects.get(email=email)
+    print(user.username)
+    usr = UserProfile.objects.get(user__username=user.username)
+    usr.avatar = 'http://' + base + key
+    usr.save()
     os.remove(localfile)
-    print('上传完毕')
+    print('上传完毕' + usr.avatar)
     return render(request, 'ipa/home.html', {
         'hasContent': 1,
         'content': '上传完毕',
         'email': email,
-        'img_url': 'http://' + user.username
+        'img_url': usr.avatar,
+        'avatar': usr.avatar
     })
 
 
@@ -182,6 +196,9 @@ def signup(request):
                 user = User.objects.create_user(email[:3], email, '123456')
                 user.is_active = 0
                 user.save()
+                usr = UserProfile.objects.create()
+                usr.user = user
+                usr.save()
                 return HttpResponse('【邮件发送成功，请注意查收！】')
             except:
                 print(email + u'【邮件发送失败】')
@@ -226,6 +243,8 @@ def checklogin(request):
     print("登陆验证：" + u_psw)
     try:
         user = User.objects.get(email=u_email)
+        # user.password = '11223344'
+        # user.save()
         print(user.password)
         if user.is_active == 0:
             return render(request, 'ipa/login.html', {
@@ -240,12 +259,17 @@ def checklogin(request):
         print(u_psw)
         # user.is_authenticated = 1
         print("登陆认证：")
+        uu = authenticate(username=user.username, password=user.password)
+        print(uu)
         print(user.is_authenticated)
+
+
         print(user.password)
         print(user.username)
         auth.login(request, user)
         print("登陆认证：")
-        return HttpResponseRedirect(reverse('ipa:home', args=(u_email,)))
+        return HttpResponseRedirect(reverse('ipa:home', args=(None)))
+        # return render(request, 'ipa/home.html')
     except User.DoesNotExist:
         return render(request, 'ipa/login.html', {
             'error_info': '用户不存在'
@@ -254,7 +278,8 @@ def checklogin(request):
 def do_logout(request):
     print("退出的登陆")
     auth.logout(request)
-    return render(request, 'ipa/index.html', {'user': ''})
+    # return render(request, 'ipa/index.html', {'user': ''})
+    return HttpResponseRedirect(reverse('ipa:index', args=(None)))
 
 
 # token验证
