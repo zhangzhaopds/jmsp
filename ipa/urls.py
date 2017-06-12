@@ -12,6 +12,8 @@ urlpatterns = [
     url(r'^checklogin$', views.checklogin, name='checklogin'),
     url(r'^home$', views.home, name='home'),
     url(r'^upload$', views.upload_file, name='upload'),
+    url(r'^home/(?P<section>[0-9])$', views.selected_section, name='selected_section'),
+    url(r'^wxappsender$', views.wxapp_sender, name='wxapp_sender')
     # url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
     # url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
 ]

@@ -2,11 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail, EmailMessage
 from .tools import Token
 from .models import UserProfile
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from qiniu import Auth, put_file, etag
-import os
+import os, json
 import markdown2
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -15,7 +15,9 @@ from .forms import RegistrationForm
 
 
 # Create your views here.
-
+sections = [
+            '微信小程序', '支付宝支付','百度钱包','中华人民共和国','四川晋商支付信息技术'
+        ]
 
 def index(request):
     current_user = ''
@@ -63,16 +65,38 @@ def password(request, type, email):
 def home(request):
     if request.user.is_authenticated:
         print("当前用户：" + request.user.username)
+        # sections = [
+        #     '微信小程序', '支付宝支付','百度钱包','中华人民共和国','四川晋商支付信息技术'
+        # ]
         return render(request, 'ipa/home.html', {
             'email': request.user.email,
             'hasContent': 0,
-            'avatar': UserProfile.objects.get(user=request.user).avatar
+            'avatar': UserProfile.objects.get(user=request.user).avatar,
+            'sections': sections
         })
     else:
         print("用户未登录，请先登录")
         return render(request, 'ipa/login.html')
 
+# home界面功能选择
+def selected_section(request, section):
+    print(request)
+    print(int(section))
+    index = int(section) - 1
+    print(sections[index])
+    return render(request, 'ipa/weixin_sender.html', {
+            'email': request.user.email,
+            'avatar': UserProfile.objects.get(user=request.user).avatar,
+        })
 
+# 微信小程序--模板消息发送
+def wxapp_sender(request):
+    print(request)
+    appid = request.GET['AppID']
+    appSecret = request.GET['AppSecret']
+    code= request.GET['Code']
+    formId = request.GET['FormId']
+    return JsonResponse({'AppID': appid, 'AppSecret': appSecret, 'Code': code, 'FormId': formId})
 
 # 文件上传
 def upload_file(request):

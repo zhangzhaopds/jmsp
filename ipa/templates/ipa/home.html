@@ -32,31 +32,42 @@
         {% endif %}
 
     </div>
-    <div class="il-content">
+    {# 上传头像 #}
+{#    <div class="il-content">#}
+{##}
+{#        {% if hasContent == 1 %}#}
+{#            <div class="upload_detail">#}
+{#                <label class="success_info">#}
+{#            {{ content }}#}
+{#            </label>#}
+{#            <img class="upload_img" src="{{ img_url }}">#}
+{#            </div>#}
+{#        {% elif hasContent == 0 %}#}
+{#            <form action="{% url 'ipa:upload' %}" method="post" enctype="multipart/form-data">#}
+{#                {% csrf_token %}#}
+{#                <a class="file">#}
+{#                    选择文件#}
+{#                    <input type="file" id="file" name="file" accept="image/*">#}
+{#                </a>#}
+{#                <input type="submit" value="提交">#}
+{#            </form>#}
+{#        {% endif %}#}
+{#    </div>#}
 
-        {% if hasContent == 1 %}
-            <div class="upload_detail">
-                <label class="success_info">
-            {{ content }}
-            </label>
-            <img class="upload_img" src="{{ img_url }}">
-            </div>
-        {% elif hasContent == 0 %}
-            <form action="{% url 'ipa:upload' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <a class="file">
-                    选择文件
-                    <input type="file" id="file" name="file" accept="image/*">
-                </a>
-                <input type="submit" value="提交">
-            </form>
-        {% endif %}
-
+    <div class="home-section-box">
+        {% for key in sections %}
+            <a href="{% url 'ipa:selected_section' forloop.counter %}" >
+                <div class="home-section-view">
+                {{ key }}
+                    {{ forloop.counter }}
+                </div>
+            </a>
+        {% endfor %}
     </div>
-    <div class="il-footer">
-        <div class="il-footer-box">
-            Rome was not built in a day!
-        </div>
-    </div>
+{#    <div class="il-footer">#}
+{#        <div class="il-footer-box">#}
+{#            Rome was not built in a day!#}
+{#        </div>#}
+{#    </div>#}
 </body>
 </html>

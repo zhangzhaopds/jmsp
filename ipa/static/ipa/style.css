@@ -256,6 +256,24 @@ a {
     margin-top: 20px;
 }
 
+.home-section-box {
+    display: flex;
+    flex-wrap: wrap;
+}
+.home-section-view {
+    margin: 20px;
+    color: green;
+    background: #F9F9F9;
+    padding: 50px;
+    border-radius: 5px;
+}
+.weixin-title {
+    margin: 10px;
+    padding: 10px;
+    font-size: larger;
+    /*color: #e5e5e5;*/
+}
+
 
 
 

@@ -1,0 +1,45 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <title>Jmsp</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'ipa/style.css' %}">
+    <link rel="apple-touch-icon" href="{% static 'ipa/images/touch_icon.png' %}">
+    <meta name="description" content="内用内测">
+    <meta name="keywords" content="jmsp">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <script>
+
+    </script>
+</head>
+<body class="il-body">
+    <div class="il-header">
+        <a href="{% url 'ipa:index' %}">
+            <img class="logo-img" src="{% static 'ipa/images/jmsp_logo.png' %}"/>
+        </a>
+        <div class="il-header-user">
+            {{ email }}
+            <a href="{% url 'ipa:logout' %}">注销</a>
+        </div>
+        {% if avatar %}
+            {% if avatar != '' %}
+                <img src="{{ avatar }}" style="width: 40px; height: 40px; float: right">
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="weixin-title">微信小程序-模板消息</div>
+    <form action="{% url 'ipa:wxapp_sender' %}" method="post">
+        {% csrf_token %}
+        AppID:<input name="AppID"/>
+        AppSecret:<input name="AppSecret"/>
+        Code: <input name="Code"/>
+        FormId: <input name="FormId"/>
+        <input type="submit">
+    </form>
+
+</body>
+</html>
