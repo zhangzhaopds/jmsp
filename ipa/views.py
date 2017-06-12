@@ -106,6 +106,46 @@ def wxapp_sender(request):
     access_json_data = access_res.json()
     access_token = access_json_data['access_token']
 
+    data = {
+                  'access_token': access_token,
+                  'touser': openId,
+                  'form_id': formId,
+                  'template_id': 'QC4qBiCIvqZsaBGMOi4hmhRqPRlW8QrRDyt50zksSzk',
+                  'page': 'pages/home/home',
+                  'data': {
+                    'keyword1': {
+                      'value': 'keyword1'
+                    },
+                    'keyword2': {
+                      'value': 'keyword1'
+                    },
+                    'keyword3': {
+                      'value': 'keyword1'
+                    },
+                    'keyword4': {
+                      'value': 'keyword1'
+                    },
+                    'keyword5': {
+                      'value': 'keyword1'
+                    },
+                    'keyword6': {
+                      'value': 'keyword1'
+                    },
+                    'keyword7': {
+                      'value': 'keyword1'
+                    },
+                    'keyword8': {
+                      'value': 'keyword1'
+                    },
+                    'keyword9': {
+                      'value': 'keyword1'
+                    }
+                  }
+                }
+    json_data = json.dumps(data)
+    sender_res = requests.get('https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send', params=json_data)
+
+
     return JsonResponse({'AppID': appid,
                          'AppSecret': appSecret,
                          'Code': code,
