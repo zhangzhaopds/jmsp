@@ -105,6 +105,9 @@ def wxapp_sender(request):
     access_res = requests.get('https://api.weixin.qq.com/cgi-bin/token', params=access_token_data)
     access_json_data = access_res.json()
     access_token = access_json_data['access_token']
+    # wxccf061de2a3561f3 @ b8bb00596ad6c01af471b926decc3df4 @ 799
+    # ce58cea9eb6c50abf7ffce5f73173 @ 0815
+    # Fz2C1NBLh10QUB0C1HxD2C15Fz20 @ oac3u0K8w8q4l2rOz1AnG1
 
     data = {
                   'access_token': access_token,
@@ -143,15 +146,19 @@ def wxapp_sender(request):
                   }
                 }
     json_data = json.dumps(data)
-    sender_res = requests.get('https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send', params=json_data)
+    sender_res = requests.post('https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send', params=json_data)
+    sender_json_data = sender_res.json()
+    print(sender_json_data)
 
-
+    # return JsonResponse({'AppID': "dsd"})
     return JsonResponse({'AppID': appid,
                          'AppSecret': appSecret,
                          'Code': code,
                          'FormId': formId,
                          'openId': openId,
-                         'access_token': access_token
+                         'access_token': access_token,
+                         'errmsg': sender_json_data['errmsg'],
+                         'errcode': sender_json_data['errcode']
                          })
 
 # 文件上传
