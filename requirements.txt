@@ -38,3 +38,4 @@ virtualenv-clone==0.2.6
 whitenoise==3.3.0
 xlwt==1.2.0
 yarl==0.9.8
+requests==2.13.0

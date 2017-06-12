@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib import auth
 from .forms import RegistrationForm
-
+import requests
 
 # Create your views here.
 sections = [
@@ -96,7 +96,23 @@ def wxapp_sender(request):
     appSecret = request.GET['AppSecret']
     code= request.GET['Code']
     formId = request.GET['FormId']
-    return JsonResponse({'AppID': appid, 'AppSecret': appSecret, 'Code': code, 'FormId': formId})
+    open_data = {'appid': appid, 'secret': appSecret, 'js_code': code, 'grant_type': 'authorization_code'}
+    open_res = requests.get('https://api.weixin.qq.com/sns/jscode2session', params=open_data)
+    open_json_data = open_res.json()
+    openId = open_json_data['openid']
+
+    access_token_data = {'appid': appid, 'secret': appSecret, 'grant_type': 'client_credential'}
+    access_res = requests.get('https://api.weixin.qq.com/cgi-bin/token', params=access_token_data)
+    access_json_data = access_res.json()
+    access_token = access_json_data['access_token']
+
+    return JsonResponse({'AppID': appid,
+                         'AppSecret': appSecret,
+                         'Code': code,
+                         'FormId': formId,
+                         'openId': openId,
+                         'access_token': access_token
+                         })
 
 # 文件上传
 def upload_file(request):
