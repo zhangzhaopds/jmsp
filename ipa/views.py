@@ -33,6 +33,7 @@ def index(request):
         'avatar': ""
     })
 
+
 def login(request):
     return render(request, 'ipa/login.html')
 

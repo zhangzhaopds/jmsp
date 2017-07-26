@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'polls',
     'ipa',
+    'porn'
 )
 
 MIDDLEWARE_CLASSES = (
