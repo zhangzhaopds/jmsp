@@ -2,5 +2,6 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^pages/$', views.pages, name='pages'),
+    url(r'^video/$', views.video, name='video'),
+    url(r'^categories/$', views.categories, name='categories')
 ]
