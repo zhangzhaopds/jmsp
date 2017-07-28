@@ -23,14 +23,6 @@ def authCode(request):
         message = '\n'.join([
             u'您的验证码为：{0}'.format(num),
         ])
-        try:
-            sendEmail = EmailMessage('用户注册', message, to=[loginName])
-            sendEmail.send()
-        except:
-            msg = {"isSuccess": False,
-                   "msg": 'Verification code sent failure'}
-            return HttpResponse(json.dumps(msg), content_type='application/json')
-
         # 写入数据到USERS表
         dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
         USERS = MongoClient(dir).unknown.USERS
@@ -45,13 +37,30 @@ def authCode(request):
                 'isActivate': False,
                 'authCode': '{0}'.format(num),
                 'joinTime': time.strftime('%Y/%m/%d %H:%M:%S %Z', time.localtime(time.time())),
+                'userName': '',
+                'backgroundPicture': '',
+                'sex': '',
+                'phone': '',
+                'avatar': '',
+                'address': '',
+                'profession': '',
+                'description': '',
+                'lastLoginTime': '',
+                'isLogin': False
             }
             # 新用户加入
-            USERS.insert({data})
+            USERS.insert(data)
             print('新用户加入')
-        msg = {"isSuccess": True,
-               "msg": 'Verification code sent successfully'}
-        return HttpResponse(json.dumps(msg), content_type='application/json')
+        try:
+            sendEmail = EmailMessage('用户注册', message, to=[loginName])
+            sendEmail.send()
+            msg = {"isSuccess": True,
+                   "msg": 'Verification code sent successfully'}
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+        except:
+            msg = {"isSuccess": False,
+                   "msg": 'Verification code sent failure'}
+            return HttpResponse(json.dumps(msg), content_type='application/json')
     else:
         msg = {"isSuccess": False,
                "msg": 'Email address is invalid'}
@@ -181,8 +190,9 @@ def userInfo(request):
             data['description'] = request.GET.get('description', '')
         print('更新的数据：')
         print(data)
-        USERS.update({'loginName': loginName, 'password': password},
-                     {'$set': data})
+        if data != {}:
+            USERS.update({'loginName': loginName, 'password': password},
+                         {'$set': data})
         user = USERS.find_one({'loginName': loginName, 'password': password})
         print('用户最新数据：')
         print(user)
