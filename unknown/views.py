@@ -6,6 +6,9 @@ import re
 import random
 import time
 
+from django.core.mail import send_mail
+from smtplib import SMTPException
+
 # Create your views here.
 
 # 获取验证码： authCode
@@ -54,6 +57,11 @@ def authCode(request):
         try:
             sendEmail = EmailMessage('用户注册', message, to=[loginName])
             sendEmail.send()
+            print(loginName)
+            # send_mail(
+            #     subject=u"xxxxxxxxxx", message=u"通知：xxxxxxxxxx",
+            #     from_email='picturewall@163.com', recipient_list=[loginName, ], fail_silently=False,
+            # )
             msg = {"isSuccess": True,
                    "msg": 'Verification code sent successfully'}
             return HttpResponse(json.dumps(msg), content_type='application/json')
@@ -65,6 +73,7 @@ def authCode(request):
         msg = {"isSuccess": False,
                "msg": 'Email address is invalid'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
+
 
 
 # 注册/重置密码： loginName + authCode + password
@@ -219,3 +228,6 @@ def userInfo(request):
         msg = {"isSuccess": False,
                "msg": 'Account or password is wrong'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
+
+
+

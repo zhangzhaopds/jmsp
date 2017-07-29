@@ -17,6 +17,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'jmspvu@gmail.com'
 EMAIL_HOST_PASSWORD = '15542659192'
+DEFAULT_FROM_EMAIL = 'jmspvu@gmail.com'
 
 # 开启不安全访问，针对google email
 # https://myaccount.google.com/lesssecureapps
