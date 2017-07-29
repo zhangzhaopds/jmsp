@@ -5,7 +5,7 @@ import json
 import re
 import random
 import time
-from smtplib import SMTPException
+
 
 # Create your views here.
 
@@ -54,17 +54,16 @@ def authCode(request):
             print('新用户加入')
         try:
             sendEmail = EmailMessage(subject='用户注册', body=message, to=[loginName])
-            sendEmail.send()
+            sendEmail.send(fail_silently=False)
             print(loginName)
             msg = {"isSuccess": True,
                    "msg": 'Verification code sent successfully'}
             return HttpResponse(json.dumps(msg), content_type='application/json')
         except Exception:
-            # msg = {"isSuccess": False,
-            #        "msg": 'Verification code sent failure'}
-            # return HttpResponse(json.dumps(msg), content_type='application/json')
-            # return HttpResponse('cuowu')
-            raise Exception
+            msg = {"isSuccess": False,
+                   "msg": 'Verification code sent failure'}
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+
     else:
         msg = {"isSuccess": False,
                "msg": 'Email address is invalid'}
