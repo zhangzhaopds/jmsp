@@ -236,6 +236,15 @@ def upload(request):
                "msg": 'Parameter is not correct'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
 
+    # USERS表
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    USERS = MongoClient(dir).unknown.USERS
+    result = USERS.find({'loginName': loginName, 'password': password})
+    if result.count() == 0:
+        msg = {"isSuccess": False,
+               "msg": 'Account or password is wrong'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     path = os.path.join(BASE_DIR, 'unknown/')
     localfile = os.path.join(path, myFile.name)
