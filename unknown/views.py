@@ -349,8 +349,8 @@ def popularSearches(request):
 # 首页100张高质量照片：      href = ''
 def photos(request):
     href = request.GET.get('href', '')
-    page = request.GET.get('page', '1')
-    pexel = 'https://www.pexels.com' + href
+    page = '?page=' + request.GET.get('page', '1')
+    pexel = 'https://www.pexels.com' + href + page
     post_data = {'page': page}
     req = requests.get(pexel, data=post_data)
     soup = BeautifulSoup(req.text)
