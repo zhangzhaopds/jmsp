@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'photos', views.photos, name='photos'),
     url(r'discover', views.discover, name='discover'),
     url(r'leaderboard', views.leaderboard, name='leaderboard'),
+    url(r'image', views.image, name='image'),
 ]

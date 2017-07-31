@@ -344,6 +344,7 @@ def popularSearches(request):
 
 # 照片： 搜索、主页、流行
 # 搜索板块： href = '/search/job/'
+# 用户空间： /u/eberhardgross/
 # Popular Photos： 过去三十天 href = '/popular-photos/'
 # Popular Photos： 所有      href = '/popular-photos/all-time/'
 # 首页100张高质量照片：      href = ''
@@ -354,7 +355,7 @@ def photos(request):
     post_data = {'page': page}
     req = requests.get(pexel, data=post_data)
     soup = BeautifulSoup(req.text)
-    photos = soup.find_all(class_='photo-item')
+    photos = soup.find_all(name='article')
     results = []
     for photo in photos:
         style = photo.img['style'][15:].rstrip(')')
@@ -479,4 +480,17 @@ def leaderboard(request):
     json_str = json.dumps(results)
     return HttpResponse(json_str, content_type='application/json')
 
-
+# 单张图片预览、下载
+# href = '/photo/desktop-wallpaper-hd-wallpaper-hdr-hdr-photography-542385/'
+def image(request):
+    href = request.GET.get('href', '')
+    pexel = 'https://www.pexels.com' + href
+    req = requests.get(pexel)
+    soup = BeautifulSoup(req.text)
+    sections = soup.find_all(class_=['photo-modal__container', 'js-insert-featured-badge'])
+    img = sections[0].a.picture.source.source.img
+    style = img['style'][16:].rstrip(')')
+    json_str = json.dumps({'href': href,
+                           'src': sections[0].a['href'],
+                           'style': style})
+    return HttpResponse(json_str, content_type='application/json')
