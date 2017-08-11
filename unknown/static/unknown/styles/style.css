@@ -1,0 +1,825 @@
+/*
+Template Name: Dotapps
+Author: DotThemes
+URL: http://www.dotthemes.com
+Version: 1.0
+Desctiption: App Landing Page HTML Template.
+*/
+/*
+====================================
+[ CSS TABLE CONTENT ]
+------------------------------------
+	1.0 - GLOBAL STYLES	
+	2.0 - HEADER SECTION
+	3.0 - BANNER SECTION
+	4.0 - ABOUT SECTION 
+	5.0 - FEATURE SECTION
+	6.0 - SCREENSHOTS SECTION 
+	7.0 - PRICING SECTION
+	8.0 - TESTIMONIALS SECTION
+	9.0 - VIDEO SECTION
+	10.0 - DOWNLOAD SECTION
+	11.0 - SUBSCRIBE SECTION 
+	12.0 - SCROLL TOP SECTION
+	13.0 - FOTTER SECTION
+-------------------------------------
+[ END CSS TABLE CONTENT ]
+=====================================
+*/
+
+/* ==========================================================================
+   1.0 - GLOBAL STYLES
+   ========================================================================== */
+html,
+button,
+input,
+select,
+textarea {
+    color: #222;
+}
+::-moz-selection {
+    background: #fff176;
+    color: #444;
+    text-shadow: none;
+}
+::selection {
+    background: #16a085;
+    color: #a4003a;
+    text-shadow: none;
+}
+img {
+    vertical-align: middle;
+}
+textarea {
+    resize: vertical;
+}
+html,
+body {
+    overflow-x: hidden;
+}
+body {
+    font-family: "Lato", Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 20px;
+    color: #555;
+    -webkit-font-smoothing: antialiased;
+    -webkit-overflow-scrolling: touch;
+}
+a img {
+    background: white;
+}
+.odd a img {
+    background: #f5f5f5;
+}
+/* Titles */
+ul, li{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 200;
+    color: #555;
+    font-family: 'Raleway', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+h2 {
+    color: #666;
+    font-weight: 500;
+    font-size: 36px;
+}
+
+/* Paragraph & Typographic */
+
+p {
+    margin: 0;
+}
+.centered {
+    text-align: center;
+}
+strong {
+    font-weight: 700;
+}
+em {
+    font-weight: 300;
+}
+pre {
+    background: #ebebeb;
+    border: none;
+    font-family: "Monaco";
+    font-size: 16px;
+    color: #666;
+    padding: 20px;
+    line-height: 28px;
+}
+small {
+    font-size: 12px;
+}
+blockquote,
+blockquote p {
+    line-height: 28px;
+    color: #999;
+    font-weight: 300;
+    font-style: italic;
+}
+blockquote {
+    position: relative;
+    margin: 0 0 40px -30px;
+    padding-left: 30px;
+    border-left: 5px solid #3498db;
+}
+blockquote cite {
+    position: absolute;
+    bottom: -25px;
+    right: 0;
+    font-size: 12px;
+    font-style: italic;
+    color: #333;
+    font-weight: 300;
+}
+blockquote cite:before {
+    content: "-- "
+}
+
+/* Links */
+
+a {
+	overflow-wrap: break-word;
+	transition: color 0.1s ease-in 0s, background 0.1s ease-in 0s;
+}
+a:hover,
+a:focus {
+    color: #009966;
+    text-decoration: none;
+    outline: 0;
+}
+a:before,
+a:after {
+    transition: color 0.1s ease-in 0s, background 0.1s ease-in 0s;
+}
+.floatleft {
+    float: left
+}
+.floatright {
+    float: right
+}
+.alignleft {
+    float: left;
+    margin-right: 15px;
+}
+.alignright {
+    float: right;
+    margin-left: 15px;
+}
+.aligncenter {
+    display: block;
+    margin: 0 auto 15px;
+}
+.fn-section-header {
+    margin-bottom: 50px;
+}
+.section-title {
+    text-transform: uppercase;
+}
+.section-padding {
+    padding: 100px 0;
+}
+
+/* COMMON CODE FOR ALL SECTION TOP BLUE COLOR
+------------------------------------------- */
+.common-section-blue-top{
+    text-align: center;
+    padding-bottom: 76px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.common-section-blue-top h2{
+    padding-bottom: 27px;
+    color: #009966;
+	font-weight: 600;
+    text-transform: uppercase;
+}
+.common-section-blue-top p{
+    color: #000;
+}
+/* COMMON CODE FOR ALL SECTION TOP WHITE COLOR
+------------------------------------------- */
+.common-section-white-top{
+    text-align: center;
+    padding-bottom: 76px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.common-section-white-top h2{
+    padding-bottom: 27px;
+    color: #fff;
+	font-weight: 600;
+    text-transform: uppercase;
+}
+.common-section-white-top p{
+    color: #fff;
+}
+/* / END COMMON CODE FOR ALL SECTION TOP
+------------------------------------- */
+
+/* ==========================================
+        2.0 HEADER SECTION
+=========================================== */
+.logo{
+    padding-top: 0px;
+}
+.logo .img-responsive {
+    width: 40px;
+    border-radius: 6px;
+}
+.logo button {
+    font-size: 10px;
+    height: 16px;
+    background-color: rgba(0,0,0,0.0);
+    border-width: 1px;
+    border-radius: 2px;
+    border-color: #fff;
+    color: #fff;
+}
+
+
+.navbar-brand div{
+    display: inline-block;
+    vertical-align: middle;
+}
+.logo li {
+    font-size: 18px;
+    color: #fff;
+    font-family: 'Raleway', sans-serif;
+    margin-left: 10px;
+}
+.navbar-default {
+	background-color: #009966;
+	border-color: transparent;
+    
+}
+.navbar-default .navbar-nav > li > a {
+    color: #fff;
+	font-weight:600;
+    font-size: 16px;
+}
+.navbar-default .navbar-nav > li > a:hover {
+	color: #FBF4B5;
+}
+.navbar-nav > li > a {
+	padding-bottom: 30px;
+	padding-top: 30px;
+    padding-left: 29px;
+}
+.navbar {
+	margin-bottom: 0;
+}
+.navbar-toggle {
+	background-color: transparent;
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	float: right;
+	margin-bottom: 8px;
+	margin-right: 15px;
+	margin-top: 8px;
+	padding: 9px 10px;
+	position: relative;
+}
+.navbar-default:hover .navbar-toggle{
+    background-color: #006600
+}
+.navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover {
+	background-color: transparent;
+	color: #006600;
+}
+/* ==========================================
+        3.0 BANNER SECTION
+========================================== */
+#banner-section{
+    /*background: url(../images/banner.jpg);*/
+    background-color: #00cc66;
+    background-size: cover;
+	padding-top: 82px;
+}
+.banner-mobile{
+    padding-top: 83px;
+    padding-bottom: 98px;
+    padding-left: 60px;
+}
+.banner-cont{
+    padding-top: 165px;
+}
+.banner-cont h1{
+    font-size: 36px;
+    color: #fff;
+	font-weight: 600;
+	padding-bottom: 42px;
+	text-transform: uppercase;
+}
+.banner-cont p{
+    color: #fff;
+    max-width: 410px;
+}
+.banner-btn{
+    padding-top: 67px;
+}
+.banner-btn a{
+	background: #fff none repeat scroll 0 0;
+	border: 1px solid transparent;
+	border-radius: 10px;
+	color: #009966;
+	font-size: 16px;
+	font-weight: 600;
+	margin-right: 10px;
+	padding: 15px;
+	/*text-transform: uppercase;*/
+	transition: all 0.5s linear 0s;
+}
+.banner-btn a:hover{
+    background: #009966;
+    color: #fff;
+    border: 1px solid #fff
+}
+
+/* ==========================================
+        4.0 ABOUT SECTION
+========================================== */
+#about-section{
+    position: relative;
+}
+.about-img{
+    position: absolute;
+    bottom: 0;
+}
+.about-btm-cont{
+    padding-top: 20px;
+}
+.about-btm-cont h4{
+    padding-bottom: 17px;
+    color: #000000;
+	font-weight: 600;
+}
+.about-btm-cont p{
+    padding-bottom: 40px;
+    color: #000000;
+}
+.about-mobile-img{
+    padding-left: 65px;
+}
+.about-pencil-img{
+    position: absolute;
+    right: 0;
+    top: -220px;
+}
+.about-img{
+    margin: 0 auto;
+}
+
+/* ==========================================
+        5.0 FEATURE SECTION
+========================================== */
+#feature-section{
+    /*background: url(../images/icon.png);*/
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+}
+.feature-top{
+    text-align: center;
+    padding-bottom: 110px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.feature-top h2{
+    padding-bottom: 27px;
+    color: #fff;
+    text-transform: uppercase;
+	font-weight: 600;
+}
+.feature-top p{
+    color: #fff;
+}
+.feature-bottom{
+    padding-top: 30px;
+}
+/* feature left start
+---------------------- */
+
+/* feature left top
+---------------------- */
+.feature-left-top {
+  border-right: 1px solid #fff;
+  max-width: 310px;
+  padding-bottom: 20px;
+  padding-right: 10px;
+  position: absolute;
+  right: -113px;
+  text-align: right;
+  top: -58px;
+}
+.feature-left-top i{
+    color: #fff;
+}
+.feature-left-top h4{
+    color: #fff;
+	 font-weight: 600;
+    padding: 10px 0;
+}
+.feature-left-top p{
+    color: #fff;
+}
+
+/* feature left middle
+---------------------- */
+.feature-left-middle {
+	border-right: 1px solid #fff;
+	max-width: 310px;
+	padding-bottom: 20px;
+	padding-right: 10px;
+	position: absolute;
+	left: -40px;
+	text-align: right;
+	top: 200px;
+}
+.feature-left-middle i{
+    color: #fff;
+}
+.feature-left-middle h4{
+    color: #fff;
+	font-weight: 600;
+    padding: 10px 0;
+}
+.feature-left-middle p{
+    color: #fff;
+}
+
+/* feature left bottom
+---------------------- */
+.feature-left-bottom {
+	border-right: 1px solid #fff;
+	max-width: 310px;
+	padding-top: 20px;
+	padding-right: 10px;
+	position: absolute;
+	right: -113px;
+	text-align: right;
+	top: 480px;
+}
+.feature-left-bottom i{
+    color: #fff;
+}
+.feature-left-bottom h4{
+    color: #fff;
+	font-weight: 600;
+    padding: 10px 0;
+}
+.feature-left-bottom p{
+    color: #fff;
+}
+
+/* feature middle mobile image
+----------------------------- */
+#feature-section{
+	padding-bottom: 160px;
+}
+.feature-middle img{
+    margin: 0 auto;
+}
+.feature-middle{
+    border: 1px solid #fff;
+    border-radius: 50%;
+    padding: 100px 25px
+}
+
+/* feature right start
+---------------------- */
+/* feature right top
+---------------------- */
+.feature-right-top {
+  border-left: 1px solid #fff;
+  max-width: 310px;
+  padding-bottom: 20px;
+  padding-left: 10px;
+  position: absolute;
+  left: -113px;
+  text-align: left;
+  top: -57px;
+}
+.feature-right-top i{
+    color: #fff;
+}
+.feature-right-top h4{
+    color: #fff;
+	font-weight: 600;
+    padding: 10px 0;
+}
+.feature-right-top p{
+    color: #fff;
+}
+
+/* feature right middle
+---------------------- */
+.feature-right-middle {
+  border-left: 1px solid #fff;
+  max-width: 310px;
+  padding-bottom: 20px;
+  padding-left: 10px;
+  position: absolute;
+  left: 10px;
+  text-align: left;
+  top: 200px;
+}
+.feature-right-middle i{
+    color: #fff;
+}
+.feature-right-middle h4{
+    color: #fff;
+	font-weight: 600;
+    padding: 10px 0;
+}
+.feature-right-middle p{
+    color: #fff;
+}
+/* feature right bottom
+---------------------- */
+.feature-right-bottom {
+	border-left: 1px solid #fff;
+	max-width: 310px;
+	padding-top: 20px;
+	padding-left: 10px;
+	position: absolute;
+	left: -113px;
+	text-align: left;
+	top: 467px;
+}
+.feature-right-bottom i{
+    color: #fff;
+}
+.feature-right-bottom h4{
+    color: #fff;
+	font-weight: 600;
+    padding: 10px 0;
+}
+.feature-right-bottom p{
+    color: #fff;
+}
+
+/* ==========================================
+    6.0 SCREENSHOTS SECTION
+========================================== */
+.screenshot{
+    position: relative;
+}
+.screenshot-all-img{
+    margin-left: 15px;
+}
+.screenshots-top{
+    text-align: center;
+    padding-bottom: 125px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.screenshots-top h2{
+    padding-bottom: 27px;
+    color: #009966;
+	font-weight:600;
+    text-transform: uppercase;
+}
+.screenshots-top p{
+    color: #000;
+}
+.screenshot-mobile-img {
+    left: 39.1%;
+    position: absolute;
+    top: -52px;
+    z-index: 1;
+}
+#screenshots-section .owl-pagination{
+    padding-top: 70px;
+}
+.owl-theme .owl-controls .owl-page span:hover {
+    background: #009966 none repeat scroll 0 0;
+    border-radius: 20px;
+    display: block;
+    height: 12px;
+    margin: 5px 7px;
+    opacity: 0.5;
+    width: 12px;
+}
+.screenshot-carousel{
+    margin-left: 20px;
+}
+
+/* ==========================================
+    7.0 PRICING SECTION
+========================================== */
+
+/* ==========================================
+    8.0 TESTIMONIALS SECTION
+========================================== */
+.testimonial-bottom{
+    text-align: center;
+}
+.testimonial-cont img{
+    border: 7px solid #ddd;
+	border-radius: 72px;
+	margin: 0 auto;
+	padding: 10px;
+}
+.testimonial-cont h3{
+    padding-top: 20px;
+	font-weight: 600;
+    padding-bottom: 10px;
+}
+.testimonial-cont h4{
+    padding-bottom: 24px;
+    color: #3d3d3d;
+}
+.testimonial-cont i{
+    /*font-size: #3d3d3d;*/
+    padding: 0 5px;
+	color:#808080;
+}
+.testimonial-cont span{
+    /*font-size: #3d3d3d;*/
+    line-height: 24px;
+}
+#testimonial-section .owl-pagination{
+    padding-top: 20px;
+}
+/* ==========================================
+    9.0 VIDEO SECTION
+========================================== */
+#video-section{
+    /*background: url(../images/video.jpg);*/
+    background-size: cover;
+    background-position: center;
+}
+.vid-section-padding {
+  padding: 150px 0 170px;
+}
+.video-top h2{
+    padding-bottom: 20px;
+}
+.video-top p{
+    font-size: 24px;
+}
+.video-play a i{
+    color: #ff0000;
+    font-size: 20px;
+    background: #fff;
+    padding: 10px 20px;
+    margin: 0 auto;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+.video-play{
+    margin-bottom: 0;
+}
+
+/* ==========================================
+    10.0 DOWNLOAD SECTION
+========================================== */
+
+.download-bottom{
+    background: #009966;
+    width: 250px;
+    border-radius: 50px;
+    
+    text-align:center;
+}
+.download-bottom:hover{
+    background: #132276;
+}
+.download-multi{
+    display: inline-block;
+}
+.download-multi i{
+    color: #fff;
+    font-size: 36px;
+    margin-left: -50px;
+}
+.download-multi p{
+    color: #fff;
+    padding-left: 30px;
+}
+.download-multi h4{
+    color: #fff;
+    font-size: 16px;
+    padding-left: 30px;
+    font-weight: bold;
+}
+.download-cont{
+    border-left: 1px solid #98a7ff;
+    padding: 10px 0 15px 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================
+    11.0 SUBSCRIBE SECTION
+========================================== */
+#subscribe-section{
+    /*background: url(../images/sucscribe.jpg);*/
+    background-size: cover;
+    background-position: center;
+}
+.form{
+    position: relative;
+}
+#email {
+	border: 1px solid #fff;
+	border-radius: 35px;
+	color: #222;
+	margin: 0 auto;
+	padding: 20px 0 20px 20px;
+	width: 590px;
+}
+#button {
+	background: #009966 none repeat scroll 0 0;
+	border: 1px solid #fff;
+	border-radius: 35px;
+	color: #fff;
+	font-weight: 600;
+	padding: 17px;
+	position: absolute;
+	right: 278px;
+	text-transform: uppercase;
+	top: 3px;
+	width: 155px;
+}
+.subscribe-icon{
+    padding-top: 60px;
+}
+.subscribe-icon a i{
+    font-size: 30px;
+    color: #c3ccff;
+    padding: 0 12px;
+}
+.subscribe-icon a i:hover{
+    color: #fff;
+}
+
+/* ==========================================
+    12.0 SCROLL TOP SECTION
+========================================== */
+#scroll-top{
+    background: #009966;
+}
+.scrollup {
+	background: #009966 none repeat scroll 0 0;
+	border: 1px solid #fff;
+	border-radius: 50%;
+	bottom: 38px;
+	color: #fff;
+	cursor: pointer;
+	font-size: 20px;
+	height: 40px;
+	line-height: 35px;
+	position: fixed;
+	right: 30px;
+	text-align: center;
+	width: 40px;
+	z-index: 1;
+}
+
+/* ==========================================
+    13.0 FOTTER SECTION
+========================================== */
+#footer-section{
+    background: #009966;
+    padding: 20px 0;
+    text-align: center;
+}
+#footer-section a{
+	color: #FBF4B5;
+}
+#footer-section a:hover{
+	color: #dddddd;
+}
+.footer-cont{
+    color: #fff;
+	font-weight:500;
+}

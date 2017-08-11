@@ -9,9 +9,13 @@ import random
 import time
 import os
 from qiniu import Auth, put_file, etag
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 
 
 # Create your views here.
+
+def index(request):
+    return render(request, 'unknown/index.html')
 
 # 获取验证码： authCode
 def authCode(request):
