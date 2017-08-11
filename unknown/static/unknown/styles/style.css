@@ -261,6 +261,14 @@ a:after {
     font-family: 'Raleway', sans-serif;
     margin-left: 10px;
 }
+
+.logo .logo-detail {
+    font-size: 15px;
+    color: #fff;
+    font-family: 'Raleway', sans-serif;
+    margin-left: 10px;
+}
+
 .navbar-default {
 	background-color: #009966;
 	border-color: transparent;
