@@ -17,4 +17,6 @@ urlpatterns = [
     url(r'discover', views.discover, name='discover'),
     url(r'leaderboard', views.leaderboard, name='leaderboard'),
     url(r'image', views.image, name='image'),
+    url(r'userPhotos', views.userPhotos, name='userPhotos'),
+    url(r'doThumbup', views.doThumbup, name='doThumbup'),
 ]

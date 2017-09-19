@@ -19,7 +19,8 @@ def index(request):
 
 # 获取验证码： authCode
 def authCode(request):
-    loginName = request.GET.get('loginName', '')
+    loginName = request.POST.get('loginName', '')
+    print(loginName)
     if re.match(r'^[0-9a-zA-Z_]{0,19}@[0-9a-zA-Z]{1,13}\.[com,cn,net]{1,3}$', loginName):
         # 发送验证码
         i = 0
@@ -55,23 +56,25 @@ def authCode(request):
                 'profession': '',
                 'description': '',
                 'lastLoginTime': '',
-                'isLogin': False
+                'isLogin': False,
+                'userID': 'vr' + str(int(time.time()))
             }
             # 新用户加入
             USERS.insert(data)
             print('新用户加入')
+        print("将要发送邮件")
         try:
             sendEmail = EmailMessage(subject='用户注册', body=message, to=[loginName])
             sendEmail.send(fail_silently=False)
-            print(loginName)
+            print("发送邮件")
             msg = {"isSuccess": True,
                    "msg": 'Verification code sent successfully'}
             return HttpResponse(json.dumps(msg), content_type='application/json')
         except Exception:
+            print("邮件发送异常")
             msg = {"isSuccess": False,
                    "msg": 'Verification code sent failure'}
             return HttpResponse(json.dumps(msg), content_type='application/json')
-
     else:
         msg = {"isSuccess": False,
                "msg": 'Email address is invalid'}
@@ -81,9 +84,9 @@ def authCode(request):
 
 # 注册/重置密码： loginName + authCode + password
 def register(request):
-    loginName = request.GET.get('loginName', '')
-    code = request.GET.get('authCode', '')
-    password = request.GET.get('password', '')
+    loginName = request.POST.get('loginName', '')
+    code = request.POST.get('authCode', '')
+    password = request.POST.get('password', '')
 
     if loginName == '' or code == '' or password == '':
         msg = {"isSuccess": False,
@@ -102,7 +105,7 @@ def register(request):
         }
         USERS.update({'loginName': loginName}, {'$set': data})
         msg = {"isSuccess": True,
-               "msg": 'Password successfully'}
+               "msg": 'successful'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
     else:
         msg = {"isSuccess": False,
@@ -112,8 +115,8 @@ def register(request):
 
 # 登陆： loginName + password
 def login(request):
-    loginName = request.GET.get('loginName', '')
-    password = request.GET.get('password', '')
+    loginName = request.POST.get('loginName', '')
+    password = request.POST.get('password', '')
     if loginName == '' and password == '':
         msg = {"isSuccess": False,
                "msg": 'Parameter is not correct'}
@@ -141,8 +144,8 @@ def login(request):
 
 # 退出登录: loginName + password
 def logout(request):
-    loginName = request.GET.get('loginName', '')
-    password = request.GET.get('password', '')
+    loginName = request.POST.get('loginName', '')
+    password = request.POST.get('password', '')
     if loginName == '' and password == '':
         msg = {"isSuccess": False,
                "msg": 'Parameter is not correct'}
@@ -170,8 +173,8 @@ def logout(request):
 # 必须：loginName + password
 # 可选：userName、backgroundPicture、sex、phone、avatar、address、profession、description
 def userInfo(request):
-    loginName = request.GET.get('loginName', '')
-    password = request.GET.get('password', '')
+    loginName = request.POST.get('loginName', '')
+    password = request.POST.get('password', '')
     if loginName == '' or password == '':
         msg = {"isSuccess": False,
                "msg": 'Parameter is not correct'}
@@ -184,22 +187,22 @@ def userInfo(request):
     if result.count() > 0:
         # 账号密码验证成功
         data = {}
-        if request.GET.get('userName', '') != '':
-            data['userName'] = request.GET.get('userName', '')
-        if request.GET.get('backgroundPicture', '') != '':
-            data['backgroundPicture'] = request.GET.get('backgroundPicture', '')
-        if request.GET.get('sex', '') != '':
-            data['sex'] = request.GET.get('sex', '')
-        if request.GET.get('phone', '') != '':
-            data['phone'] = request.GET.get('phone', '')
-        if request.GET.get('avatar', '') != '':
-            data['avatar'] = request.GET.get('avatar', '')
-        if request.GET.get('address', '') != '':
-            data['address'] = request.GET.get('address', '')
-        if request.GET.get('profession', '') != '':
-            data['profession'] = request.GET.get('profession', '')
-        if request.GET.get('description', '') != '':
-            data['description'] = request.GET.get('description', '')
+        if request.POST.get('userName', '') != '':
+            data['userName'] = request.POST.get('userName', '')
+        if request.POST.get('backgroundPicture', '') != '':
+            data['backgroundPicture'] = request.POST.get('backgroundPicture', '')
+        if request.POST.get('sex', '') != '':
+            data['sex'] = request.POST.get('sex', '')
+        if request.POST.get('phone', '') != '':
+            data['phone'] = request.POST.get('phone', '')
+        if request.POST.get('avatar', '') != '':
+            data['avatar'] = request.POST.get('avatar', '')
+        if request.POST.get('address', '') != '':
+            data['address'] = request.POST.get('address', '')
+        if request.POST.get('profession', '') != '':
+            data['profession'] = request.POST.get('profession', '')
+        if request.POST.get('description', '') != '':
+            data['description'] = request.POST.get('description', '')
         print('更新的数据：')
         print(data)
         if data != {}:
@@ -220,7 +223,8 @@ def userInfo(request):
             'joinTime': user['joinTime'],
             'loginName': user['loginName'],
             'lastLoginTime': user['lastLoginTime'],
-            'isLogin': user['isLogin']
+            'isLogin': user['isLogin'],
+            'userID': user['userID']
         }
         msg = {"isSuccess": True,
                'userInfo': userInfo,
@@ -233,10 +237,17 @@ def userInfo(request):
         return HttpResponse(json.dumps(msg), content_type='application/json')
 
 # 照片上传 POST: loginName + password + file
+# 可选 isPanorama: 等于"1"为true,其他均为false
+# width height  size
 def upload(request):
+    print("图片上传upload")
     loginName = request.POST.get('loginName', None)
     password = request.POST.get('password', None)
     myFile = request.FILES.get("file", None)
+    isPanorama = request.POST.get('isPanorama', False)
+    width = request.POST.get('width', 0)
+    height = request.POST.get('height', 0)
+    size = request.POST.get('size', 0)
     if loginName == None or password == None or myFile == None:
         msg = {"isSuccess": False,
                "msg": 'Parameter is not correct'}
@@ -250,13 +261,69 @@ def upload(request):
         msg = {"isSuccess": False,
                "msg": 'Account or password is wrong'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
+    user = USERS.find_one({'loginName': loginName, 'password': password})
+    userID = user['userID']
 
+    if isPanorama != False and isPanorama == "1":
+        isPanorama = True
+    else:
+        isPanorama = False
+
+    # 上传到七牛
+    qiniu = updateImageToQiNiu(userID=userID, file=myFile)
+
+    updateDate = qiniu[1]
+    avatar = qiniu[0]
+    postDate = str(int(time.time()))
+
+    # 写入数据库表PHOTOS
+    addImageToPHOTOS(userID=userID, postDate=postDate, updateDate=updateDate, url=avatar, isPanorama=isPanorama, width=width, height=height, size=size)
+
+    msg = {"isSuccess": True,
+           'data': {
+                "userID": userID,
+                "postDate": postDate,
+                "updateDate": updateDate,
+                "url": avatar,
+                "isPanorama": isPanorama,
+                "width": width,
+                "height": height,
+                "size": size
+                },
+           "msg": 'Upload successfully'}
+    return HttpResponse(json.dumps(msg), content_type='application/json')
+
+# 新增照片到表PHOTOS
+def addImageToPHOTOS(userID, postDate, updateDate, url, isPanorama, width, height, size):
+    print("---开始新增照片到表PHOTOS---")
+    print("userID=" + userID, "postDate=" + postDate, "updateDate=" + updateDate, "url=" + url, "isPanorama=" + str(isPanorama), "width=" + str(width), "height=" + str(height), "size=" + str(size))
+    # 写入数据到PHOTOS表
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    PHOTOS = MongoClient(dir).unknown.PHOTOS
+    data = {
+        "userID": userID,
+        "postDate": postDate,
+        "updateDate": updateDate,
+        "url": url,
+        "isPanorama": isPanorama,
+        "width": width,
+        "height": height,
+        "size": size,
+        "thumbupCount": 0
+    }
+    PHOTOS.insert(data)
+    print(data)
+    print("----PHOTOS表写入数据结束-----")
+
+
+# 图片上传到七牛
+def updateImageToQiNiu(userID, file):
+    print("----开始图片上传到七牛----")
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     path = os.path.join(BASE_DIR, 'unknown/')
-    localfile = os.path.join(path, myFile.name)
-
+    localfile = os.path.join(path, file.name)
     destination = open(localfile, 'wb+')  # 打开特定的文件进行二进制的写操作
-    for chunk in myFile.chunks():  # 分块写入文件
+    for chunk in file.chunks():  # 分块写入文件
         destination.write(chunk)
     destination.close()
 
@@ -271,7 +338,8 @@ def upload(request):
     bucket_name = 'jmspvu'
 
     # 文件保存名
-    key = loginName + "/" + myFile.name
+    now = int(time.time())
+    key = "vr/" + userID + "/" + str(now)
 
     # 不能出现 http://  或者 https:// 字样，否则heroku中出错
     base = 'opu0gas3t.bkt.clouddn.com/'
@@ -286,14 +354,180 @@ def upload(request):
     avatar = 'http://' + base + key
     os.remove(localfile)
     print('上传完毕' + avatar)
-    msg = {"isSuccess": True,
-           'data': {
-               'loginName': loginName,
-               'img': avatar,
-               'size': myFile.size,
-           },
-           "msg": 'Upload successfully'}
-    return HttpResponse(json.dumps(msg), content_type='application/json')
+    return (avatar, str(now))
+
+# 查询图片
+# 必要：loginName password
+# 条件： userID    isPanorama   postDate    updateDate
+def userPhotos(request):
+    print("获取用户照片")
+    loginName = request.POST.get('loginName', None)
+    password = request.POST.get('password', None)
+    userID = request.POST.get('userID', None)
+    isPanorama = request.POST.get('isPanorama', None)
+    postDate = request.POST.get('postDate', None)
+    updateDate = request.POST.get('updateDate', None)
+    if loginName == None or password == None:
+        msg = {"isSuccess": False,
+               "msg": 'Parameter is not correct'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    # 身份验证
+    print("数据库USERS连接")
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    USERS = MongoClient(dir).unknown.USERS
+    print("查询")
+    result = USERS.find({'loginName': loginName, 'password': password})
+    if result.count() == 0:
+        msg = {"isSuccess": False,
+               "msg": 'Account or password is wrong'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    print("数据库PHOTOS连接")
+    # 图片查找
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    PHOTOS = MongoClient(dir).unknown.PHOTOS
+
+    # 查询条件
+    conditions = {}
+    if userID != None:
+        conditions['userID'] = userID
+    if isPanorama != None:
+        if isPanorama == "1":
+            conditions['isPanorama'] = True
+        else:
+            conditions['isPanorama'] = False
+    if postDate != None:
+        conditions['postDate'] = postDate
+    if updateDate != None:
+        conditions['updateDate'] = updateDate
+
+    print('查询条件：', conditions)
+
+    photos = PHOTOS.find(conditions)
+    if photos.count() > 0:
+        datas = []
+        for photo in iter(photos):
+            thumbup = isCurrentUserThumbup(photo['updateDate'], photo['userID'])
+            datas.append({
+                'userID': photo['userID'],
+                'postDate': photo['postDate'],
+                'updateDate': photo['updateDate'],
+                'url': photo['url'],
+                'isPanorama': photo['isPanorama'],
+                'width': photo['width'],
+                'height': photo['height'],
+                'size': photo['size'],
+                'thumbupUsers': getThumbupCountByUpdateDate(photo['updateDate']),
+                'isUserThumbup': thumbup
+            })
+        print('查询结果', datas)
+        msg = {"isSuccess": True,
+               "data":  datas,
+               "msg": 'successful'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+    else:
+        print("无数据")
+        msg = {"isSuccess": False,
+               "msg": 'no data'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+# 点赞查询
+# updateDate  userID 二选一
+def getThumbupCount():
+    # 点赞表 THUMBUP
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    THUMBUP = MongoClient(dir).unknown.THUMBUP
+    result = THUMBUP.find()
+    return result.count()
+
+def getThumbupCountByUserID(userID):
+    # 点赞表 THUMBUP
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    THUMBUP = MongoClient(dir).unknown.THUMBUP
+    result = THUMBUP.find({'userID': userID})
+    #THUMBUP.insert({'updateDate': updateDate, 'userID': userID})
+    data = []
+    if result.count() > 0:
+        for res in iter(result):
+            data.append(res['updateDate'])
+    print("查询userID结果", data)
+    return data
+
+def getThumbupCountByUpdateDate(updateDate):
+    data = []
+    # 点赞表 THUMBUP
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    THUMBUP = MongoClient(dir).unknown.THUMBUP
+    result = THUMBUP.find({'updateDate': updateDate})
+    if result.count() > 0:
+        for res in iter(result):
+            data.append(res['userID'])
+    print("查询updateDate结果", data)
+    return data
+
+# 是否点赞
+def isCurrentUserThumbup(updateDate, userID):
+    # 点赞表 THUMBUP
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    THUMBUP = MongoClient(dir).unknown.THUMBUP
+    result = THUMBUP.find({'userID': userID, 'updateDate': updateDate})
+    print("是否点赞")
+    return result.count() > 0
+
+
+# 图片点赞/取消点赞
+# 必要： updateDate  userID
+def doThumbup(request):
+    print("-----点赞doThumbup-----")
+    updateDate = request.POST.get('updateDate', None)
+    userID = request.POST.get('userID', None)
+    if updateDate == None or userID == None:
+        msg = {"isSuccess": False,
+               "msg": 'Parameter is not correct'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    # 点赞表 THUMBUP
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    THUMBUP = MongoClient(dir).unknown.THUMBUP
+
+    result = THUMBUP.find({'updateDate': updateDate, 'userID': userID})
+    if result.count() > 0:
+        THUMBUP.remove({'updateDate': updateDate, 'userID': userID})
+        res = THUMBUP.find()
+        thumb = isCurrentUserThumbup(updateDate, userID)
+        msg = {"isSuccess": True,
+               "data": {
+                   'thumbupCount': res.count(),
+                   'isUserThumbup': thumb
+               },
+               "msg": 'successful'}
+        print('取消点赞', msg)
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+    else:
+        THUMBUP.insert({'updateDate': updateDate, 'userID': userID})
+        res = THUMBUP.find()
+        thumb = isCurrentUserThumbup(updateDate, userID)
+        msg = {"isSuccess": True,
+               "data": {
+                   'thumbupCount': res.count(),
+                   'isUserThumbup': thumb
+               },
+               "msg": 'successful'}
+        print("点赞", msg)
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 主页背景照片
 def homeBgImg(request):
