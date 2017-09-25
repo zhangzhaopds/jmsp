@@ -8,7 +8,7 @@ import re
 import random
 import time
 import os
-from qiniu import Auth, put_file, etag
+from qiniu import Auth, put_file, etag, BucketManager
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 
 
@@ -277,7 +277,7 @@ def upload(request):
     postDate = str(int(time.time()))
 
     # 写入数据库表PHOTOS
-    addImageToPHOTOS(userID=userID, postDate=postDate, updateDate=updateDate, url=avatar, isPanorama=isPanorama, width=width, height=height, size=size)
+    imgInfo = addImageToPHOTOS(userID=userID, postDate=postDate, updateDate=updateDate, url=avatar, isPanorama=isPanorama)
 
     msg = {"isSuccess": True,
            'data': {
@@ -285,36 +285,55 @@ def upload(request):
                 "postDate": postDate,
                 "updateDate": updateDate,
                 "url": avatar,
+                'tempURL': avatar + "?imageView2/0/w/500",
                 "isPanorama": isPanorama,
-                "width": width,
-                "height": height,
-                "size": size
+                'width': imgInfo['width'],
+                'height': imgInfo['height'],
+                'size': imgInfo['size'],
+                'format': imgInfo['format'],
                 },
            "msg": 'Upload successfully'}
     return HttpResponse(json.dumps(msg), content_type='application/json')
 
 # 新增照片到表PHOTOS
-def addImageToPHOTOS(userID, postDate, updateDate, url, isPanorama, width, height, size):
+def addImageToPHOTOS(userID, postDate, updateDate, url, isPanorama):
     print("---开始新增照片到表PHOTOS---")
-    print("userID=" + userID, "postDate=" + postDate, "updateDate=" + updateDate, "url=" + url, "isPanorama=" + str(isPanorama), "width=" + str(width), "height=" + str(height), "size=" + str(size))
+    print("userID=" + userID, "postDate=" + postDate, "updateDate=" + updateDate, "url=" + url, "isPanorama=" + str(isPanorama))
     # 写入数据到PHOTOS表
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     PHOTOS = MongoClient(dir).unknown.PHOTOS
-    data = {
-        "userID": userID,
-        "postDate": postDate,
-        "updateDate": updateDate,
-        "url": url,
-        "isPanorama": isPanorama,
-        "width": width,
-        "height": height,
-        "size": size,
-        "thumbupCount": 0
-    }
+    res = requests.get(url + '?imageInfo')
+    try:
+        data = {
+            "userID": userID,
+            "postDate": postDate,
+            "updateDate": updateDate,
+            "url": url,
+            'tempURL': url + "?imageView2/0/w/500",
+            "isPanorama": isPanorama,
+            'width': res.json()['width'],
+            'height': res.json()['height'],
+            'size': res.json()['size'],
+            'format': res.json()['format'],
+            "thumbupCount": 0
+        }
+    except:
+        data = {
+            "userID": userID,
+            "postDate": postDate,
+            "updateDate": updateDate,
+            "url": url,
+            'tempURL': url + "?imageView2/0/w/500",
+            "isPanorama": isPanorama,
+            'width': 0,
+            'height': 0,
+            'size': 0,
+            'format': '',
+            "thumbupCount": 0
+        }
     PHOTOS.insert(data)
-    print(data)
     print("----PHOTOS表写入数据结束-----")
-
+    return data
 
 # 图片上传到七牛
 def updateImageToQiNiu(userID, file):
@@ -356,6 +375,68 @@ def updateImageToQiNiu(userID, file):
     print('上传完毕' + avatar)
     return (avatar, str(now))
 
+# 删除照片
+# 必要：loginName password
+# 条件： updateDate
+def deletePhoto(request):
+    print("删除照片")
+    loginName = request.POST.get('loginName', None)
+    password = request.POST.get('password', None)
+    updateDate = request.POST.get('updateDate', None)
+    userID = request.POST.get('userID', None)
+    if loginName == None or password == None or userID == None or updateDate == None:
+        msg = {"isSuccess": False,
+               "msg": 'Parameter is not correct'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    # 身份验证
+    print("数据库USERS连接")
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    USERS = MongoClient(dir).unknown.USERS
+    print("查询")
+    result = USERS.find({'loginName': loginName, 'password': password})
+    print("用户验证结束", result)
+    if result.count() == 0:
+        msg = {"isSuccess": False,
+               "msg": 'Account or password is wrong'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    print("数据库PHOTOS连接")
+    # 图片查找
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    PHOTOS = MongoClient(dir).unknown.PHOTOS
+    PHOTOS.remove({"updateDate": updateDate})
+
+    print("照片数据库删除")
+
+    # 七牛删除
+    access_key = 'CfEmsrk8eSKQtZ8OY5NHUPWJ3VKfoGHEP1fzYStf'
+    secretKey = 'cdxPmlWXpkAGUeGRZkhocGMYfVnqdEa-otwer9Ma'
+    # 初始化Auth状态
+    q = Auth(access_key, secretKey)
+    # 初始化BucketManager
+    bucket = BucketManager(q)
+    # 你要测试的空间， 并且这个key在你空间中存在
+    bucket_name = 'jmspvu'
+    key = 'vr/' + userID + "/" + str(updateDate)
+    print(key)
+    # 删除bucket_name 中的文件 key
+    ret, info = bucket.delete(bucket_name, key)
+    print(info)
+    print(ret)
+    if ret != None:
+        msg = {"isSuccess": True,
+           "msg": 'successful'}
+        print('删除结果', msg)
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+    else:
+        msg = {"isSuccess": False,
+               "msg": 'fail'}
+        print('删除结果', msg)
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+
+
 # 查询图片
 # 必要：loginName password
 # 条件： userID    isPanorama   postDate    updateDate
@@ -378,6 +459,7 @@ def userPhotos(request):
     USERS = MongoClient(dir).unknown.USERS
     print("查询")
     result = USERS.find({'loginName': loginName, 'password': password})
+    print("用户验证结束", result)
     if result.count() == 0:
         msg = {"isSuccess": False,
                "msg": 'Account or password is wrong'}
@@ -408,29 +490,24 @@ def userPhotos(request):
     if photos.count() > 0:
         datas = []
         for photo in iter(photos):
-            thumbup = isCurrentUserThumbup(photo['updateDate'], photo['userID'])
-            datas.append({
-                'userID': photo['userID'],
-                'postDate': photo['postDate'],
-                'updateDate': photo['updateDate'],
-                'url': photo['url'],
-                'isPanorama': photo['isPanorama'],
-                'width': photo['width'],
-                'height': photo['height'],
-                'size': photo['size'],
-                'thumbupUsers': getThumbupCountByUpdateDate(photo['updateDate']),
-                'isUserThumbup': thumbup
-            })
-        print('查询结果', datas)
+            photo.pop('_id')
+            dic = json.loads(json.dumps(photo))
+            user = USERS.find_one({'loginName': loginName, 'password': password})
+            dic['userAvatar'] = user['avatar']
+            dic['userName'] = user['userName']
+            datas.append(dic)
         msg = {"isSuccess": True,
                "data":  datas,
                "msg": 'successful'}
+        print('查询结果', msg)
         return HttpResponse(json.dumps(msg), content_type='application/json')
     else:
         print("无数据")
         msg = {"isSuccess": False,
                "msg": 'no data'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    
 
 # 点赞查询
 # updateDate  userID 二选一
@@ -471,8 +548,9 @@ def isCurrentUserThumbup(updateDate, userID):
     # 点赞表 THUMBUP
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     THUMBUP = MongoClient(dir).unknown.THUMBUP
+    # THUMBUP.ensure_index("userID")
+    # THUMBUP.ensure_index("updateDate")
     result = THUMBUP.find({'userID': userID, 'updateDate': updateDate})
-    print("是否点赞")
     return result.count() > 0
 
 
