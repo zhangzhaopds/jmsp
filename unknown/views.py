@@ -10,7 +10,8 @@ import time
 import os
 from qiniu import Auth, put_file, etag, BucketManager
 from django.shortcuts import render, get_object_or_404, get_list_or_404
-
+import smtplib
+from email.mime.text import MIMEText
 
 # Create your views here.
 
@@ -31,7 +32,7 @@ def authCode(request):
             num = n * 10 ** (4 - i) + num
         print("验证码为：{0}".format(num))
         message = '\n'.join([
-            u'您的验证码为：{0}'.format(num),
+            u'Your verification code：{0}'.format(num),
         ])
         # 写入数据到USERS表
         dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
@@ -63,14 +64,26 @@ def authCode(request):
             USERS.insert(data)
             print('新用户加入')
         print("将要发送邮件")
+
+        _user = "736694109@qq.com"
+        _pwd = "jxftilaxkhqibdbj"
+        _to = loginName
+
+        msg = MIMEText(message)
+        msg["Subject"] = "LvyeVR"
+        msg["From"] = _user
+        msg["To"] = _to
+
         try:
-            sendEmail = EmailMessage(subject='sign up', body=message, to=[loginName])
-            sendEmail.send(fail_silently=False)
-            print("发送邮件")
+            s = smtplib.SMTP_SSL("smtp.qq.com", 465)
+            s.login(_user, _pwd)
+            s.sendmail(_user, _to, msg.as_string())
+            s.quit()
+            print("邮件发送成功")
             msg = {"isSuccess": True,
                    "msg": 'Verification code sent successfully'}
             return HttpResponse(json.dumps(msg), content_type='application/json')
-        except Exception:
+        except smtplib.SMTPException:
             print("邮件发送异常")
             msg = {"isSuccess": False,
                    "msg": 'Verification code sent failure'}
