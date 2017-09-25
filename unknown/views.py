@@ -64,7 +64,7 @@ def authCode(request):
             print('新用户加入')
         print("将要发送邮件")
         try:
-            sendEmail = EmailMessage(subject='用户注册', body=message, to=[loginName])
+            sendEmail = EmailMessage(subject='sign up', body=message, to=[loginName])
             sendEmail.send(fail_silently=False)
             print("发送邮件")
             msg = {"isSuccess": True,
@@ -507,7 +507,7 @@ def userPhotos(request):
                "msg": 'no data'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
 
-    
+
 
 # 点赞查询
 # updateDate  userID 二选一
@@ -594,16 +594,6 @@ def doThumbup(request):
                "msg": 'successful'}
         print("点赞", msg)
         return HttpResponse(json.dumps(msg), content_type='application/json')
-
-
-
-
-
-
-
-
-
-
 
 
 
