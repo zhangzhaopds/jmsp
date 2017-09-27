@@ -48,14 +48,14 @@ def authCode(request):
                 'isActivate': False,
                 'authCode': '{0}'.format(num),
                 'joinTime': time.strftime('%Y/%m/%d %H:%M:%S %Z', time.localtime(time.time())),
-                'userName': '',
+                'userName': 'So What',
                 'backgroundPicture': '',
-                'sex': '',
+                'sex': '1', # 默认1 男， 2 女
                 'phone': '',
-                'avatar': '',
+                'avatar': 'http://7xoz39.com1.z0.glb.clouddn.com/lvyevr_default_avatar.JPG',
                 'address': '',
                 'profession': '',
-                'description': '',
+                'description': 'Say something to introduce yourself',
                 'lastLoginTime': '',
                 'isLogin': False,
                 'userID': 'vr' + str(int(time.time()))
