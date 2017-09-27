@@ -251,16 +251,14 @@ def userInfo(request):
 
 # 照片上传 POST: loginName + password + file
 # 可选 isPanorama: 等于"1"为true,其他均为false
-# width height  size
+# isAavatar: "1" 用户头像， 其他普通照片
 def upload(request):
     print("图片上传upload")
     loginName = request.POST.get('loginName', None)
     password = request.POST.get('password', None)
     myFile = request.FILES.get("file", None)
     isPanorama = request.POST.get('isPanorama', False)
-    width = request.POST.get('width', 0)
-    height = request.POST.get('height', 0)
-    size = request.POST.get('size', 0)
+    isAavatar = request.POST.get('isAavatar', False)
     if loginName == None or password == None or myFile == None:
         msg = {"isSuccess": False,
                "msg": 'Parameter is not correct'}
@@ -282,6 +280,11 @@ def upload(request):
     else:
         isPanorama = False
 
+    if isAavatar != False and isAavatar == "1":
+        isAavatar = True
+    else:
+        isAavatar = False
+
     # 上传到七牛
     qiniu = updateImageToQiNiu(userID=userID, file=myFile)
 
@@ -289,24 +292,41 @@ def upload(request):
     avatar = qiniu[0]
     postDate = str(int(time.time()))
 
-    # 写入数据库表PHOTOS
-    imgInfo = addImageToPHOTOS(userID=userID, postDate=postDate, updateDate=updateDate, url=avatar, isPanorama=isPanorama)
-
-    msg = {"isSuccess": True,
+    if isAavatar:
+        print("头像上传")
+        # USERS表
+        dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+        USERS = MongoClient(dir).unknown.USERS
+        USERS.update({'loginName': loginName, 'password': password},
+                     {'$set': {'avatar': avatar}})
+        msg = {"isSuccess": True,
+               'data': {
+                   "userID": userID,
+                   "url": avatar,
+               },
+               "msg": 'Upload successfully'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+    else:
+        # 写入数据库表PHOTOS
+        print("普通照片上传")
+        imgInfo = addImageToPHOTOS(userID=userID, postDate=postDate, updateDate=updateDate, url=avatar, isPanorama=isPanorama)
+        msg = {"isSuccess": True,
            'data': {
-                "userID": userID,
-                "postDate": postDate,
-                "updateDate": updateDate,
-                "url": avatar,
-                'tempURL': avatar + "?imageView2/0/w/500",
-                "isPanorama": isPanorama,
-                'width': imgInfo['width'],
-                'height': imgInfo['height'],
-                'size': imgInfo['size'],
-                'format': imgInfo['format'],
-                },
+               "userID": userID,
+               "postDate": postDate,
+               "updateDate": updateDate,
+               "url": avatar,
+               'tempURL': avatar + "?imageView2/0/w/500",
+               "isPanorama": isPanorama,
+               'width': imgInfo['width'],
+               'height': imgInfo['height'],
+               'size': imgInfo['size'],
+               'format': imgInfo['format'],
+           },
            "msg": 'Upload successfully'}
-    return HttpResponse(json.dumps(msg), content_type='application/json')
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+
 
 # 新增照片到表PHOTOS
 def addImageToPHOTOS(userID, postDate, updateDate, url, isPanorama):
