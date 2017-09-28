@@ -471,34 +471,34 @@ def deletePhoto(request):
 
 
 # 查询图片
-# 必要：loginName password
+
 # 条件： userID    isPanorama   postDate    updateDate
 def userPhotos(request):
     print("获取用户照片")
-    loginName = request.POST.get('loginName', None)
-    password = request.POST.get('password', None)
+    # loginName = request.POST.get('loginName', None)
+    # password = request.POST.get('password', None)
     userID = request.POST.get('userID', None)
     isPanorama = request.POST.get('isPanorama', None)
     postDate = request.POST.get('postDate', None)
     updateDate = request.POST.get('updateDate', None)
-    if loginName == None or password == None:
-        msg = {"isSuccess": False,
-               "msg": 'Parameter is not correct'}
-        return HttpResponse(json.dumps(msg), content_type='application/json')
+    # if loginName == None or password == None:
+    #     msg = {"isSuccess": False,
+    #            "msg": 'Parameter is not correct'}
+    #     return HttpResponse(json.dumps(msg), content_type='application/json')
 
-    # 身份验证
+    #身份验证
     print("数据库USERS连接")
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     USERS = MongoClient(dir).unknown.USERS
-    print("查询")
-    result = USERS.find({'loginName': loginName, 'password': password})
-    print("用户验证结束", result)
-    if result.count() == 0:
-        msg = {"isSuccess": False,
-               "msg": 'Account or password is wrong'}
-        return HttpResponse(json.dumps(msg), content_type='application/json')
-
-    print("数据库PHOTOS连接")
+    # print("查询")
+    # result = USERS.find({'loginName': loginName, 'password': password})
+    # print("用户验证结束", result)
+    # if result.count() == 0:
+    #     msg = {"isSuccess": False,
+    #            "msg": 'Account or password is wrong'}
+    #     return HttpResponse(json.dumps(msg), content_type='application/json')
+    #
+    # print("数据库PHOTOS连接")
     # 图片查找
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     PHOTOS = MongoClient(dir).unknown.PHOTOS
@@ -525,7 +525,7 @@ def userPhotos(request):
         for photo in iter(photos):
             photo.pop('_id')
             dic = json.loads(json.dumps(photo))
-            user = USERS.find_one({'loginName': loginName, 'password': password})
+            user = USERS.find_one({'userID': photo['userID']})
             dic['userAvatar'] = user['avatar']
             dic['userName'] = user['userName']
             datas.append(dic)
