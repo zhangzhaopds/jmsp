@@ -75,8 +75,8 @@ def authCode(request):
         msg["To"] = _to
 
         try:
-            s = smtplib.SMTP()
-            s.connect("smtp.163.com")
+            s = smtplib.SMTP_SSL("smtp.163.com")
+            # s.connect()
             s.login(_user, _pwd)
             s.sendmail(_user, _to, msg.as_string())
             s.close()
