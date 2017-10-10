@@ -48,14 +48,14 @@ def authCode(request):
                 'isActivate': False,
                 'authCode': '{0}'.format(num),
                 'joinTime': time.strftime('%Y/%m/%d %H:%M:%S %Z', time.localtime(time.time())),
-                'userName': '',
+                'userName': 'So What',
                 'backgroundPicture': '',
                 'sex': '1', # 默认1 男， 2 女
                 'phone': '',
-                'avatar': '',
+                'avatar': 'http://7xoz39.com1.z0.glb.clouddn.com/lvyevr_default_avatar.JPG',
                 'address': '',
                 'profession': '',
-                'description': '',
+                'description': 'Say something to introduce yourself',
                 'lastLoginTime': '',
                 'isLogin': False,
                 'userID': 'vr' + str(int(time.time()))
@@ -65,8 +65,8 @@ def authCode(request):
             print('新用户加入')
         print("将要发送邮件")
 
-        _user = "lvyevrpro@163.com"
-        _pwd = "2017lvyevr"
+        _user = "736694109@qq.com"
+        _pwd = "blzfqwgcyiwjbbej"
         _to = loginName
 
         msg = MIMEText(message)
@@ -75,11 +75,10 @@ def authCode(request):
         msg["To"] = _to
 
         try:
-            s = smtplib.SMTP_SSL("smtp.163.com")
-            # s.connect()
+            s = smtplib.SMTP_SSL("smtp.qq.com", 465)
             s.login(_user, _pwd)
             s.sendmail(_user, _to, msg.as_string())
-            s.close()
+            s.quit()
             print("邮件发送成功")
             msg = {"isSuccess": True,
                    "msg": 'Verification code sent successfully'}
