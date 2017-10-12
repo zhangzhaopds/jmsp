@@ -147,7 +147,23 @@ def login(request):
                                'isLogin': True}})
         user = USERS.find_one({'loginName': loginName, 'password': password})
         print(user)
+        userInfo = {
+            'userName': user['userName'],
+            'backgroundPicture': user['backgroundPicture'],
+            'sex': user['sex'],
+            'phone': user['phone'],
+            'avatar': user['avatar'],
+            'address': user['address'],
+            'profession': user['profession'],
+            'description': user['description'],
+            'joinTime': user['joinTime'],
+            'loginName': user['loginName'],
+            'lastLoginTime': user['lastLoginTime'],
+            'isLogin': user['isLogin'],
+            'userID': user['userID']
+        }
         msg = {"isSuccess": True,
+               'userInfo': userInfo,
                "msg": 'Login successfully'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
     else:
