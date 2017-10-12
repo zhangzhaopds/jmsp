@@ -511,42 +511,40 @@ def deletePhoto(request):
 
 
 # 查询图片
-
 # 条件： userID    isPanorama   postDate    updateDate
+# userID + isShowThumbup    同时存在（isShowThumbup == "1"）时，显示userID对应用户是否对照片点赞
 def userPhotos(request):
     print("获取用户照片")
-    # loginName = request.POST.get('loginName', None)
-    # password = request.POST.get('password', None)
     userID = request.POST.get('userID', None)
     isPanorama = request.POST.get('isPanorama', None)
     postDate = request.POST.get('postDate', None)
     updateDate = request.POST.get('updateDate', None)
-    # if loginName == None or password == None:
-    #     msg = {"isSuccess": False,
-    #            "msg": 'Parameter is not correct'}
-    #     return HttpResponse(json.dumps(msg), content_type='application/json')
+    page = request.POST.get('page', 0)
+    isShowThumbup = request.POST.get('isShowThumbup', None)
 
     #身份验证
-    print("数据库USERS连接")
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     USERS = MongoClient(dir).unknown.USERS
-    # print("查询")
-    # result = USERS.find({'loginName': loginName, 'password': password})
-    # print("用户验证结束", result)
-    # if result.count() == 0:
-    #     msg = {"isSuccess": False,
-    #            "msg": 'Account or password is wrong'}
-    #     return HttpResponse(json.dumps(msg), content_type='application/json')
-    #
-    # print("数据库PHOTOS连接")
-    # 图片查找
-    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+
+    # 图片
     PHOTOS = MongoClient(dir).unknown.PHOTOS
+
+    # 点赞
+    THUMBUP = MongoClient(dir).unknown.THUMBUP
 
     # 查询条件
     conditions = {}
+
+    # 显示userID对应用户是否对照片点赞
+    isShow = False
+
+    # userID不为空 + isShowThumbup为空 = userID作为筛选条件
     if userID != None:
-        conditions['userID'] = userID
+        if isShowThumbup != None:
+            if isShowThumbup == "1":
+                isShow = True
+        else:
+            conditions['userID'] = userID
     if isPanorama != None:
         if isPanorama == "1":
             conditions['isPanorama'] = True
@@ -557,12 +555,42 @@ def userPhotos(request):
     if updateDate != None:
         conditions['updateDate'] = updateDate
 
+    page = int(page)
+    num = 8
+
     print('查询条件：', conditions)
 
     photos = PHOTOS.find(conditions)
-    if photos.count() > 0:
+    if photos != None:
+        # 倒序
+        photos = list(photos)
+        photos.reverse()
+    else:
+        print("无数据")
+        msg = {"isSuccess": False,
+               "msg": 'no data'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+    if len(photos) > 0:
         datas = []
-        for photo in iter(photos):
+        sum = len(photos)
+        cur = num * (page + 1)
+        sumPages = 0
+        if len(photos) % num > 0:
+            sumPages = len(photos) // num + 1
+        else:
+            sumPages = len(photos) // num
+
+        print("数据" , str(len(photos)), str(sumPages) , str(page + 1))
+        if page + 1 > sumPages:
+            print("页码超出")
+            msg = {"isSuccess": False,
+                   "msg": 'no data'}
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+
+        if cur > sum:
+            cur = sum
+        for i in range(page * num, cur):
+            photo = photos[i]
             photo.pop('_id')
             dic = json.loads(json.dumps(photo))
             user = USERS.find_one({'userID': photo['userID']})
@@ -570,8 +598,24 @@ def userPhotos(request):
             dic['userName'] = user['userName']
             dic['userBgImage'] = user['backgroundPicture']
             dic['userDesc'] = user['description']
+
+            # 点赞数
+            thumup = THUMBUP.find({'updateDate': photo['updateDate']})
+            isCurThumbup = False
+            if isShow:
+                isCurThumbup = THUMBUP.find_one({'userID': userID, 'updateDate': photo['updateDate']}) != None
+
+            # 当前用户是否点在此照片
+            dic['isCurThumbup'] = isCurThumbup
+            if thumup == None:
+                dic['thumbupCount'] = 0
+            else:
+                dic['thumbupCount'] = thumup.count()
+
             datas.append(dic)
         msg = {"isSuccess": True,
+               'totalPages': sumPages,
+                'currentPage': page + 1,
                "data":  datas,
                "msg": 'successful'}
         print('查询结果', msg)
@@ -623,9 +667,7 @@ def isCurrentUserThumbup(updateDate, userID):
     # 点赞表 THUMBUP
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     THUMBUP = MongoClient(dir).unknown.THUMBUP
-    # THUMBUP.ensure_index("userID")
-    # THUMBUP.ensure_index("updateDate")
-    result = THUMBUP.find({'userID': userID, 'updateDate': updateDate})
+    result = THUMBUP.find_one({'userID': userID, 'updateDate': updateDate})
     return result.count() > 0
 
 
@@ -644,15 +686,14 @@ def doThumbup(request):
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     THUMBUP = MongoClient(dir).unknown.THUMBUP
 
-    result = THUMBUP.find({'updateDate': updateDate, 'userID': userID})
-    if result.count() > 0:
+    result = THUMBUP.find_one({'updateDate': updateDate, 'userID': userID})
+    if result != None:
         THUMBUP.remove({'updateDate': updateDate, 'userID': userID})
         res = THUMBUP.find()
-        thumb = isCurrentUserThumbup(updateDate, userID)
         msg = {"isSuccess": True,
                "data": {
                    'thumbupCount': res.count(),
-                   'isUserThumbup': thumb
+                   'isCurrentUserThumbup': result == None
                },
                "msg": 'successful'}
         print('取消点赞', msg)
@@ -660,11 +701,10 @@ def doThumbup(request):
     else:
         THUMBUP.insert({'updateDate': updateDate, 'userID': userID})
         res = THUMBUP.find()
-        thumb = isCurrentUserThumbup(updateDate, userID)
         msg = {"isSuccess": True,
                "data": {
                    'thumbupCount': res.count(),
-                   'isUserThumbup': thumb
+                   'isCurrentUserThumbup': result == None
                },
                "msg": 'successful'}
         print("点赞", msg)
