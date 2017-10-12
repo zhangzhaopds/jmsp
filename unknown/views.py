@@ -49,10 +49,10 @@ def authCode(request):
                 'authCode': '{0}'.format(num),
                 'joinTime': time.strftime('%Y/%m/%d %H:%M:%S %Z', time.localtime(time.time())),
                 'userName': 'So What',
-                'backgroundPicture': '',
+                'backgroundPicture': 'http://7xoz39.com1.z0.glb.clouddn.com/lvyevr_default_bgImage.JPG',
                 'sex': '1', # 默认1 男， 2 女
                 'phone': '',
-                'avatar': 'http://7xoz39.com1.z0.glb.clouddn.com/lvyevr_default_avatar.JPG',
+                'avatar': 'http://7xoz39.com1.z0.glb.clouddn.com/default_avatar.png',
                 'address': '',
                 'profession': '',
                 'description': 'Say something to introduce yourself',
