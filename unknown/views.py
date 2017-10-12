@@ -568,6 +568,8 @@ def userPhotos(request):
             user = USERS.find_one({'userID': photo['userID']})
             dic['userAvatar'] = user['avatar']
             dic['userName'] = user['userName']
+            dic['userBgImage']: user['backgroundPicture']
+            dic['userDesc']: user['description']
             datas.append(dic)
         msg = {"isSuccess": True,
                "data":  datas,
