@@ -520,6 +520,7 @@ def userPhotos(request):
     postDate = request.POST.get('postDate', None)
     updateDate = request.POST.get('updateDate', None)
     page = request.POST.get('page', 0)
+
     isShowThumbup = request.POST.get('isShowThumbup', None)
 
     #身份验证
@@ -556,7 +557,7 @@ def userPhotos(request):
         conditions['updateDate'] = updateDate
 
     page = int(page)
-    num = 8
+    num = 20
 
     print('查询条件：', conditions)
 
