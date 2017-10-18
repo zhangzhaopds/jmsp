@@ -907,21 +907,14 @@ def leaderboard(request):
 def image(request):
     href = request.GET.get('href', '')
     pexel = 'https://www.pexels.com' + href
-    print(pexel)
     req = requests.get(pexel)
     soup = BeautifulSoup(req.text, "html.parser")
 
-    # 2017-10-11 修改： pexel网站节点类名变化，导致解析失败
-    # 修改前
-    # sections = soup.find_all(class_=['photo-modal__container', 'js-insert-featured-badge'])
-    # img = sections[0].a.picture.source.source.img
-
     # 修改后
-    sections = soup.find_all(class_=['photo-modal', 'js-insert-featured-badge'])
-    img = sections[0].picture.source.source.img
+    sections = soup.find_all(class_=['js-download'])
+    print('下载地址', sections[0]['href'])
 
-    style = img['style'][16:].rstrip(')')
     json_str = json.dumps({'href': href,
-                           'src': sections[0].a['href'],
-                           'style': style})
+                           'src': sections[0]['href'],
+                           'style': "119, 121, 121"})
     return HttpResponse(json_str, content_type='application/json')
