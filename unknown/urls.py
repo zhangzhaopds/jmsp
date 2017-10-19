@@ -20,4 +20,6 @@ urlpatterns = [
     url(r'userPhotos', views.userPhotos, name='userPhotos'),
     url(r'doThumbup', views.doThumbup, name='doThumbup'),
     url(r'deletePhoto', views.deletePhoto, name='deletePhoto'),
+    url(r'blocked', views.blocked, name='blocked'),
+    url(r'getBlockedList', views.getBlockedList, name='getBlockedList'),
 ]

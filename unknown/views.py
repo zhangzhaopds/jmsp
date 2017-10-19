@@ -512,7 +512,7 @@ def deletePhoto(request):
 
 # 查询图片
 # 条件： userID    isPanorama   postDate    updateDate
-# userID + isShowThumbup    同时存在（isShowThumbup == "1"）时，显示userID对应用户是否对照片点赞
+# 已登录用户：userID + isShowThumbup    同时存在（isShowThumbup == "1"）时，显示userID对应用户是否对照片点赞
 def userPhotos(request):
     print("获取用户照片")
     userID = request.POST.get('userID', None)
@@ -539,22 +539,46 @@ def userPhotos(request):
     # 显示userID对应用户是否对照片点赞
     isShow = False
 
+    # 超级管理员
+    supBlockedUsers = []
+    supBlockedImages = []
+
+    # 一般用户
+    blockedImages = getBlockedImages(userID)
+    blockedUsers = getBlockedUsers(userID)
+
     # userID不为空 + isShowThumbup为空 = userID作为筛选条件
     if userID != None:
         if isShowThumbup != None:
             if isShowThumbup == "1":
+                # 已登录用户的朋友圈照片： 所有用户的照片+点赞
                 isShow = True
+            conditions['userID'] = {"$nin": blockedUsers + supBlockedUsers}
+            conditions['updateDate'] = {"$nin": blockedImages + supBlockedImages}
         else:
+            # 指定用户发布的照片：指定用户的照片+无点赞
+            if userID in supBlockedUsers:
+                print(userID, "已被超管拉黑---无数据")
+                msg = {"isSuccess": False,
+                       "msg": 'In the blocked list'}
+                return HttpResponse(json.dumps(msg), content_type='application/json')
             conditions['userID'] = userID
-    if isPanorama != None:
-        if isPanorama == "1":
-            conditions['isPanorama'] = True
-        else:
-            conditions['isPanorama'] = False
-    if postDate != None:
-        conditions['postDate'] = postDate
-    if updateDate != None:
-        conditions['updateDate'] = updateDate
+            conditions['updateDate'] = {"$nin": blockedImages + supBlockedImages}
+    else:
+        # 游客的朋友圈照片：所有用户的照片+无点赞
+        conditions['userID'] = {"$nin": supBlockedUsers}
+        conditions['updateDate'] = {"$nin": supBlockedImages}
+
+    # 暂不开放
+    # if isPanorama != None:
+    #     if isPanorama == "1":
+    #         conditions['isPanorama'] = True
+    #     else:
+    #         conditions['isPanorama'] = False
+    # if postDate != None:
+    #     conditions['postDate'] = postDate
+    # if updateDate != None:
+    #     conditions['updateDate'] = updateDate
 
     page = int(page)
     num = 20
@@ -562,6 +586,7 @@ def userPhotos(request):
     print('查询条件：', conditions)
 
     photos = PHOTOS.find(conditions)
+
     if photos != None:
         # 倒序
         photos = list(photos)
@@ -581,7 +606,7 @@ def userPhotos(request):
         else:
             sumPages = len(photos) // num
 
-        print("数据" , str(len(photos)), str(sumPages) , str(page + 1))
+        print("照片查询数据" , str(len(photos)), str(sumPages) , str(page + 1))
         if page + 1 > sumPages:
             print("页码超出")
             msg = {"isSuccess": False,
@@ -727,6 +752,201 @@ def homeBgImg(request):
                          'small': small}
     })
     return HttpResponse(json_str, content_type='application/json')
+
+# 照片拉黑/取消拉黑
+# 表： 用户黑名单 BLOCKEDPERSON  照片黑名单 BLOCKEDIMAGE
+# loginName  password 必须
+# updateDate： 拉黑照片， userID： 拉黑对象
+def blocked(request):
+    print("拉黑请求")
+    loginName = request.POST.get('loginName', None)
+    password = request.POST.get('password', None)
+    updateDate = request.POST.get('updateDate', None)
+    userID = request.POST.get('userID', None)
+    if loginName == None or password == None or (userID == None and updateDate == None)or (userID != None and updateDate != None):
+        msg = {"isSuccess": False,
+               "msg": 'Parameter is not correct'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    print("拉黑请求参数：", loginName, password, userID, updateDate)
+
+    # 登陆用户身份验证
+    print("数据库USERS连接")
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    USERS = MongoClient(dir).unknown.USERS
+    print("查询")
+    user = USERS.find_one({'loginName': loginName, 'password': password})
+    if user == None:
+        msg = {"isSuccess": False,
+               "msg": 'Account or password is wrong'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+    print("用户验证结束", user['userID'])
+    currentUserID = user['userID']
+
+    # 表： 用户黑名单 BLOCKEDPERSON  照片黑名单 BLOCKEDIMAGE
+    BLOCKEDPERSON = None
+    BLOCKEDIMAGE = None
+    if userID != None:
+        # 目标用户验证
+        targetUser = USERS.find_one({'userID': userID})
+        if targetUser == None:
+            msg = {"isSuccess": False,
+                   "msg": 'The target user does not exist'}
+            print("The target user does not exist")
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+        elif user['userID'] == userID:
+            # 拒绝拉黑自己
+            msg = {"isSuccess": False,
+                   "msg": 'The target user is yourself'}
+            print("The target user is yourself")
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+
+        # 用户黑名单
+        BLOCKEDPERSON = MongoClient(dir).unknown.BLOCKEDPERSON
+    if updateDate != None:
+        # 目标照片验证
+        PHOTOS = MongoClient(dir).unknown.PHOTOS
+        photo = PHOTOS.find_one({'updateDate': updateDate})
+        if photo == None:
+            msg = {"isSuccess": False,
+                   "msg": 'The target photo does not exist'}
+            print("The target photo does not exist")
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+
+        #照片黑名单
+        BLOCKEDIMAGE = MongoClient(dir).unknown.BLOCKEDIMAGE
+
+    if (BLOCKEDPERSON == None and BLOCKEDIMAGE == None) or (BLOCKEDPERSON != None and BLOCKEDIMAGE != None):
+        print("不能同时初始化两个数据库")
+        msg = {"isSuccess": False,
+               "msg": 'Parameter is not correct'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    # 照片拉黑、取消拉黑
+    if BLOCKEDIMAGE != None:
+        images = BLOCKEDIMAGE.find_one({'user': currentUserID, 'blockedImage': updateDate})
+        if images != None:
+            # 已经在黑名单中的照片就移除黑名单
+            BLOCKEDIMAGE.remove({'user': currentUserID, 'blockedImage': updateDate})
+            msg = {"isSuccess": True,
+                   'data': {
+                       'user': currentUserID, 'blockedImage': updateDate
+                   },
+                    "msg": 'Removed from blocked list'}
+            print('对照片---取消拉黑', msg)
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+        else:
+            # 加入黑名单
+            BLOCKEDIMAGE.insert({'user': currentUserID, 'blockedImage': updateDate})
+            msg = {"isSuccess": True,
+                   'data': {
+                       'user': currentUserID, 'blockedImage': updateDate
+                   },
+                    "msg": 'Added to blocked list'}
+            print('对照片---加入拉黑', msg)
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    # 用户拉黑、取消拉黑
+    if BLOCKEDPERSON != None:
+        persons = BLOCKEDPERSON.find_one({'user': currentUserID, 'blockedUser': userID})
+        if persons != None:
+            # 已经在黑名单中的用户就移除黑名单
+            BLOCKEDPERSON.remove({'user': currentUserID, 'blockedUser': userID})
+            msg = {"isSuccess": True,
+                   'data': {
+                       'user': currentUserID, 'blockedUser': userID
+                   },
+                   "msg": 'Removed from blocked list'}
+            print('对用户---取消拉黑', msg)
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+        else:
+            # 加入黑名单
+            BLOCKEDPERSON.insert({'user': currentUserID, 'blockedUser': userID})
+            msg = {"isSuccess": True,
+                   'data': {
+                       'user': currentUserID, 'blockedUser': userID
+                   },
+                    "msg": 'Added to blocked list'}
+            print('对用户---加入拉黑', msg)
+            return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    msg = {"isSuccess": False,
+           "msg": 'wrong'}
+    print('拉黑---错误', msg)
+    return HttpResponse(json.dumps(msg), content_type='application/json')
+
+
+# 照片黑名单
+def getBlockedImages(userID):
+    print('获取照片黑名单')
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    # 表黑名单
+    BLOCKEDIMAGE = MongoClient(dir).unknown.BLOCKEDIMAGE
+    images = BLOCKEDIMAGE.find({'user': userID})
+    datas = []
+    if images.count() > 0:
+        for image in images:
+            datas.append(image['blockedImage'])
+    print(userID, "的照片黑名单:", datas)
+    return datas
+
+
+# 用户黑名单
+def getBlockedUsers(userID):
+    print('获取用户黑名单')
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    # 表黑名单
+    BLOCKEDPERSON = MongoClient(dir).unknown.BLOCKEDPERSON
+    persons = BLOCKEDPERSON.find({'user': userID})
+    datas = []
+    if persons.count() > 0:
+        for person in persons:
+            datas.append(person['blockedUser'])
+    print(userID, "的用户黑名单:", datas)
+    return datas
+
+
+
+# 用户黑名单查询
+# userID
+def getBlockedList(request):
+
+    print('获取黑名单')
+    userID = request.POST.get('userID', None)
+    if userID == None:
+        msg = {"isSuccess": False,
+               "msg": 'Parameter is not correct'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    USERS = MongoClient(dir).unknown.USERS
+    user = USERS.find_one({'userID': userID})
+    if user == None:
+        msg = {"isSuccess": False,
+               "msg": 'The user does not exist'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    # 获取userID的照片黑名单
+    getBlockedImages(userID)
+    getBlockedUsers(userID)
+
+    # 表黑名单
+    BLOCKEDPERSON = MongoClient(dir).unknown.BLOCKEDPERSON
+    persons = BLOCKEDPERSON.find({'user': userID})
+    if persons.count() == 0:
+        msg = {"isSuccess": False,
+               "msg": 'no data'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+    else:
+        datas = []
+        for person in persons:
+            person.pop('_id')
+            dic = json.loads(json.dumps(person))
+            datas.append(dic)
+        print(userID, "的用户黑名单", datas)
+        msg = {"isSuccess": True,
+               "data": datas,
+                "msg": 'successful'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
 
 # 搜索标签
 def searchTags(request):
