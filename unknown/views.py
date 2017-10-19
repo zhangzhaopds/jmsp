@@ -938,8 +938,9 @@ def getBlockedList(request):
             person.pop('_id')
             person.pop('user')
             dic = json.loads(json.dumps(person))
-            dic["userName"] = user['userName']
-            dic["avatar"] = user['avatar']
+            target = USERS.find_one({'userID': person["blockedUser"]})
+            dic["userName"] = target['userName']
+            dic["avatar"] = target['avatar']
             datas.append(dic)
         print(userID, "的用户黑名单", datas)
         msg = {"isSuccess": True,
