@@ -925,10 +925,6 @@ def getBlockedList(request):
                "msg": 'The user does not exist'}
         return HttpResponse(json.dumps(msg), content_type='application/json')
 
-    # 获取userID的照片黑名单
-    getBlockedImages(userID)
-    getBlockedUsers(userID)
-
     # 表黑名单
     BLOCKEDPERSON = MongoClient(dir).unknown.BLOCKEDPERSON
     persons = BLOCKEDPERSON.find({'user': userID})
@@ -940,7 +936,10 @@ def getBlockedList(request):
         datas = []
         for person in persons:
             person.pop('_id')
+            person.pop('user')
             dic = json.loads(json.dumps(person))
+            dic["userName"] = user['userName']
+            dic["avatar"] = user['avatar']
             datas.append(dic)
         print(userID, "的用户黑名单", datas)
         msg = {"isSuccess": True,
