@@ -294,6 +294,13 @@ def upload(request):
     user = USERS.find_one({'loginName': loginName, 'password': password})
     userID = user['userID']
 
+    blockedUsers = getBlockedUsers(None)
+    if userID in blockedUsers:
+        print(userID, "已被超管拉黑")
+        msg = {"isSuccess": False,
+               "msg": 'You are in the blocked list'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
     if isPanorama != False and isPanorama == "1":
         isPanorama = True
     else:
@@ -560,7 +567,7 @@ def userPhotos(request):
             if userID in blockedUsers:
                 print(userID, "已被超管拉黑---无数据")
                 msg = {"isSuccess": False,
-                       "msg": 'In the blocked list'}
+                       "msg": 'You are in the blocked list'}
                 return HttpResponse(json.dumps(msg), content_type='application/json')
             conditions['userID'] = userID
             conditions['updateDate'] = {"$nin": blockedImages}
@@ -908,7 +915,6 @@ def getBlockedUsers(userID):
             datas.append(person['blockedUser'])
     print(userID, "的用户黑名单:", datas)
     return datas
-
 
 
 # 用户黑名单查询
