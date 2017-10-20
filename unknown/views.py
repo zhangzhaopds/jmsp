@@ -553,21 +553,21 @@ def userPhotos(request):
             if isShowThumbup == "1":
                 # 已登录用户的朋友圈照片： 所有用户的照片+点赞
                 isShow = True
-            conditions['userID'] = {"$nin": blockedUsers + supBlockedUsers}
-            conditions['updateDate'] = {"$nin": blockedImages + supBlockedImages}
+            conditions['userID'] = {"$nin": blockedUsers}
+            conditions['updateDate'] = {"$nin": blockedImages}
         else:
             # 指定用户发布的照片：指定用户的照片+无点赞
-            if userID in supBlockedUsers:
+            if userID in blockedUsers:
                 print(userID, "已被超管拉黑---无数据")
                 msg = {"isSuccess": False,
                        "msg": 'In the blocked list'}
                 return HttpResponse(json.dumps(msg), content_type='application/json')
             conditions['userID'] = userID
-            conditions['updateDate'] = {"$nin": blockedImages + supBlockedImages}
+            conditions['updateDate'] = {"$nin": blockedImages}
     else:
         # 游客的朋友圈照片：所有用户的照片+无点赞
-        conditions['userID'] = {"$nin": supBlockedUsers}
-        conditions['updateDate'] = {"$nin": supBlockedImages}
+        conditions['userID'] = {"$nin": blockedUsers}
+        conditions['updateDate'] = {"$nin": blockedImages}
 
     # 暂不开放
     # if isPanorama != None:
@@ -877,12 +877,14 @@ def blocked(request):
 
 
 # 照片黑名单
+# 超管：zhangzhaopds@gmail.com    vr1506590977
 def getBlockedImages(userID):
     print('获取照片黑名单')
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     # 表黑名单
     BLOCKEDIMAGE = MongoClient(dir).unknown.BLOCKEDIMAGE
-    images = BLOCKEDIMAGE.find({'user': userID})
+    # 用户的黑名单+超管的黑名单
+    images = BLOCKEDIMAGE.find({'user': {"$in": [userID, 'vr1506590977']}})
     datas = []
     if images.count() > 0:
         for image in images:
@@ -892,12 +894,14 @@ def getBlockedImages(userID):
 
 
 # 用户黑名单
+# 超管：zhangzhaopds@gmail.com    vr1506590977
 def getBlockedUsers(userID):
     print('获取用户黑名单')
     dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
     # 表黑名单
     BLOCKEDPERSON = MongoClient(dir).unknown.BLOCKEDPERSON
-    persons = BLOCKEDPERSON.find({'user': userID})
+    # 用户的黑名单+超管的黑名单
+    persons = BLOCKEDPERSON.find({'user': {"$in": [userID, 'vr1506590977']}})
     datas = []
     if persons.count() > 0:
         for person in persons:
