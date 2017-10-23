@@ -70,7 +70,7 @@ def authCode(request):
         _to = loginName
 
         msg = MIMEText(message)
-        msg["Subject"] = "LvyeVR"
+        msg["Subject"] = "iWorld"
         msg["From"] = _user
         msg["To"] = _to
 
@@ -759,6 +759,49 @@ def homeBgImg(request):
                          'small': small}
     })
     return HttpResponse(json_str, content_type='application/json')
+
+# 举报
+# 举报人： loginName  password
+# 被举报： userID updateDate url
+def report(request):
+    loginName = request.POST.get('loginName', None)
+    password = request.POST.get('password', None)
+    updateDate = request.POST.get('updateDate', None)
+    userID = request.POST.get('userID', None)
+    url = request.POST.get('url', None)
+    if loginName == None or password == None or userID == None or updateDate == None or url == None:
+        msg = {"isSuccess": False,
+               "msg": 'Parameter is not correct'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    print("举报请求参数：", loginName, password, userID, updateDate)
+
+    # 登陆用户身份验证
+    print("数据库USERS连接")
+    dir = 'mongodb://unknownadmin:unknown123456@ds051645.mlab.com:51645/unknown'
+    USERS = MongoClient(dir).unknown.USERS
+    print("查询")
+    user = USERS.find_one({'loginName': loginName, 'password': password})
+    if user == None:
+        msg = {"isSuccess": False,
+               "msg": 'Account or password is wrong'}
+        return HttpResponse(json.dumps(msg), content_type='application/json')
+
+    # 举报表 REPORTS
+    REPORTS = MongoClient(dir).unknown.REPORTS
+    data = {
+        'url': url,
+        'userID': userID,
+        'updateDate': updateDate,
+        'reporter': loginName
+    }
+    REPORTS.insert(data)
+    print("举报数据添加到数据库完成")
+
+    msg = {"isSuccess": True,
+           "msg": 'Added to Reports'}
+    print("Added to Reports")
+    return HttpResponse(json.dumps(msg), content_type='application/json')
 
 # 照片拉黑/取消拉黑
 # 表： 用户黑名单 BLOCKEDPERSON  照片黑名单 BLOCKEDIMAGE

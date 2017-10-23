@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'deletePhoto', views.deletePhoto, name='deletePhoto'),
     url(r'blocked', views.blocked, name='blocked'),
     url(r'getBlockedList', views.getBlockedList, name='getBlockedList'),
+    url(r'report', views.report, name='report'),
 ]
