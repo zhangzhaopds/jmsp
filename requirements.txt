@@ -21,7 +21,7 @@ itsdangerous==0.24
 jsondatabase==0.1.7
 markdown2==2.3.4
 multidict==2.1.4
-nltk==3.2.4
+nltk==3.4.5
 oauthlib==2.0.2
 olefile==0.44
 pbr==2.0.0
