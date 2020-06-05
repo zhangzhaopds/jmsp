@@ -11,7 +11,7 @@ Cython==0.25.2
 da==0.1
 dj-database-url==0.4.2
 dj-static==0.0.6
-Django==1.10.6
+Django==1.11.29
 django-toolbelt==0.0.1
 ed25519==1.4
 freeze-requirements==0.5.1
