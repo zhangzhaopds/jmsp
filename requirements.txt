@@ -19,7 +19,7 @@ future==0.16.0
 gunicorn==19.7.1
 itsdangerous==0.24
 jsondatabase==0.1.7
-markdown2==2.3.4
+markdown2==2.4.0
 multidict==2.1.4
 nltk==3.2.4
 oauthlib==2.0.2
